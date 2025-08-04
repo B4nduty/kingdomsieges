@@ -1,0 +1,35 @@
+{
+	"schemaVersion": 1,
+	"id": "kingdomsieges",
+	"version": "${version}",
+	"name": "Kingdoms & Sieges",
+	"description": "",
+	"authors": [],
+	"contact": {},
+	"license": "All-Rights-Reserved",
+	"icon": "assets/kingdomsieges/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"banduty.kingdomsieges.Kingdomsieges"
+		],
+		"fabric-datagen": [
+			"banduty.kingdomsieges.Kingdomsieges"
+		],
+		"client": [
+			"banduty.kingdomsieges.KingdomsiegesClient"
+		]
+	},
+	"mixins": [
+		"kingdomsieges.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.14",
+		"minecraft": "~1.20.1",
+		"architectury": ">=9.2.14",
+		"stoneycore": ">=0.4.1",
+		"geckolib": ">=4.7.1.2",
+		"java": ">=17",
+		"fabric-api": "*"
+	}
+}

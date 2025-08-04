@@ -1,0 +1,83 @@
+{
+  "item.kingdomsieges.cannon_spawner": "Cannon Spawner",
+  "item.kingdomsieges.battering_ram_spawner": "Battering Ram Spawner",
+  "item.kingdomsieges.ribauldequin_spawner": "Ribauldequin Spawner",
+  "item.kingdomsieges.mangonel_spawner": "Mangonel Spawner",
+  "item.kingdomsieges.trebuchet_spawner": "Trebuchet Spawner",
+  "item.kingdomsieges.mantlet_spawner": "Mantlet Spawner",
+  "item.kingdomsieges.ramrod": "Ramrod",
+
+  "item.kingdomsieges.cannon_manuscript": "Manuscript",
+  "text.tooltip.kingdomsieges.blueprint.cannon_structure": "Cannon",
+
+  "item.kingdomsieges.battering_ram_manuscript": "Manuscript",
+  "text.tooltip.kingdomsieges.blueprint.battering_ram_structure": "Battering Ram",
+
+  "item.kingdomsieges.ribauldequin_manuscript": "Manuscript",
+  "text.tooltip.kingdomsieges.blueprint.ribauldequin_structure": "Ribauldequin",
+
+  "item.kingdomsieges.mangonel_manuscript": "Manuscript",
+  "text.tooltip.kingdomsieges.blueprint.mangonel_structure": "Mangonel",
+
+  "item.kingdomsieges.trebuchet_manuscript": "Manuscript",
+  "text.tooltip.kingdomsieges.blueprint.trebuchet_structure": "Trebuchet",
+
+  "item.kingdomsieges.mantlet_manuscript": "Manuscript",
+  "text.tooltip.kingdomsieges.blueprint.mantlet_structure": "Mantlet",
+
+  "itemGroup.kingdomsieges.ks_tab": "Kingdoms & Sieges",
+  "text.itemgroup.kingdomsieges.tab.ks_siege_machines": "KS Siege Machines",
+  "text.itemgroup.kingdomsieges.tab.ks_items": "KS Items",
+
+  "entity.kingdomsieges.cannon_entity": "Cannon",
+  "entity.kingdomsieges.battering_ram_entity": "Battering Ram",
+  "entity.kingdomsieges.ribauldequin_entity": "Ribauldequin",
+  "entity.kingdomsieges.mangonel_entity": "Mangonel",
+  "entity.kingdomsieges.trebuchet_entity": "Trebuchet",
+  "entity.kingdomsieges.mantlet_entity": "Mantlet",
+
+  "entity.kingdomsieges.cannon_entity.black_powder_needed": "You need 32 Black Powder to load the cannon.",
+  "entity.kingdomsieges.cannon_entity.next_load": "You must load next: %s",
+  "entity.kingdomsieges.ribauldequin_entity.black_powder_needed": "You need 2 Black Powder to load the ribauldequin.",
+  "entity.kingdomsieges.ribauldequin_entity.next_load": "You must load next: %s",
+  "entity.kingdomsieges.mangonel_entity.ammo_needed": "It needs Stone or Magma Block",
+  "entity.kingdomsieges.trebuchet_entity.rotten_flesh": "It needs x9 Rotten Flesh",
+  "entity.kingdomsieges.trebuchet_entity.ammo_needed": "It needs Stone, Magma Block or Rotten Flesh",
+
+  "text.land.kingdomsieges.stored": "Stored %d emerald(s)",
+  "text.land.kingdomsieges.stored_needed": "Stored Emerald: %d / %d",
+  "text.land.kingdomsieges.at_max_radius": "Your Kingdom has reached the max radius",
+  "text.land.kingdomsieges.already_ruling": "You already rule a Kingdom",
+  "text.land.kingdomsieges.created": "Kingdom Created!",
+  "text.land.kingdomsieges.fall": "%s's Kingdom has Fallen!",
+  "text.land.kingdomsieges.land_name": "%s's Kingdom",
+  "text.land.kingdomsieges.changed_name": "Changed the name to %s's Kingdom",
+  "text.land.kingdomsieges.winner": "§aVictory! §rYour kingdom has prevailed",
+  "text.land.kingdomsieges.loser": "§cDefeat... §rYour kingdom has fallen",
+  "text.land.kingdomsieges.defenders_remaining": "%s vs %s | Defenders Remaining: %s / %s",
+  "text.land.kingdomsieges.attackers_remaining": "%s vs %s | Attackers Remaining: %s / %s",
+  "text.land.kingdomsieges.surrender": "§c%s's Kingdom surrendered",
+  "text.land.kingdomsieges.owner.add_ally": "Added %s as an ally",
+  "text.land.kingdomsieges.ally.add_ally": "You've been added as an ally for %s`s Kingdom",
+  "text.land.kingdomsieges.owner.remove_ally": "Removed %s as an ally",
+  "text.land.kingdomsieges.ally.remove_ally": "You've been removed as an ally for %s`s Kingdom",
+
+  "text.siege_machine.kingdomsieges.cooling_down": "%s is cooling down",
+
+  "text.config.kingdomsieges.title": "Kingdom & Sieges",
+  "text.config.kingdomsieges.option.bellRingTime": "When Kingdom's Bell should Ring",
+  "text.config.kingdomsieges.enum.choices.never": "Never",
+  "text.config.kingdomsieges.enum.choices.every_ingame_hour": "Every Ingame Hour",
+  "text.config.kingdomsieges.enum.choices.twelve_ingame_hours": "Twelve Ingame Hours",
+  "text.config.kingdomsieges.enum.choices.every_hour": "Every Hour",
+  "text.config.kingdomsieges.enum.choices.twelve_hours": "Twelve Hours",
+  "text.config.kingdomsieges.option.expandFormula": "Price formula for extending the Kingdom",
+  "text.config.kingdomsieges.option.cannonRange": "Cannon Entity Range Render",
+  "text.config.kingdomsieges.option.ribauldequinRange": "Ribauldequin Entity Range Render",
+  "text.config.kingdomsieges.option.batteringRamRange": "Battering Ram Entity Range Render",
+  "text.config.kingdomsieges.option.mangonelRange": "Mangonel Entity Range Render",
+  "text.config.kingdomsieges.option.trebuchetRange": "Trebuchet Entity Range Render",
+  "text.config.kingdomsieges.option.mantletRange": "Mantlet Entity Range Render",
+  "text.config.kingdomsieges.option.cannonBallRange": "Cannon Ball Entity Range Render",
+  "text.config.kingdomsieges.option.trebuchetProjectileRange": "Trebuchet Projectile Entity Range Render"
+}

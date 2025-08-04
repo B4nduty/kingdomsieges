@@ -1,0 +1,16 @@
+pluginManagement {
+	repositories {
+		maven {
+			name = 'Fabric'
+			url = 'https://maven.fabricmc.net/'
+		}
+		mavenCentral()
+		gradlePluginPortal()
+	}
+}
+
+include ':stoneycore'
+project(':stoneycore').projectDir = new File("C:\\Users\\regan\\OneDrive\\Escritorio\\Banduty's Mods\\StoneyCore")
+
+include ':streq'
+project(':streq').projectDir = new File("C:\\Users\\regan\\OneDrive\\Escritorio\\Banduty's Mods\\streq-mod\\common")
