@@ -2,6 +2,7 @@ package banduty.kingdomsieges.entity.custom.projectiles;
 
 import banduty.stoneycore.entity.custom.AbstractSiegeEntity;
 import banduty.stoneycore.entity.custom.AbstractSiegeProjectile;
+import banduty.stoneycore.util.BlockDamageTracker;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.AreaEffectCloudEntity;
@@ -12,13 +13,10 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
-import net.minecraft.network.packet.s2c.play.BlockBreakingProgressS2CPacket;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -67,23 +65,12 @@ public class TrebuchetProjectile extends AbstractSiegeProjectile {
     }
 
     @Override
-    protected void onEntityHit(EntityHitResult entityHitResult) {
-        super.onEntityHit(entityHitResult);
-        setVelocity(getVelocity().multiply(-10).multiply(0.9));
-        setDamage(getDamage() * 0.9);
-        if (getDamage() <= 1) this.discard();
-    }
-
-    @Override
     public void tick() {
         super.tick();
 
-        if (this.getWorld().isClient()) {
-            return;
+        if (this.getWorld() instanceof ServerWorld serverWorld) {
+            BlockDamageTracker.clean(serverWorld);
         }
-
-        if (this.getOwner() instanceof AbstractSiegeEntity abstractSiegeEntity) cleanInvalidBlockDamages(abstractSiegeEntity);
-        else this.discard();
     }
 
     @Override
@@ -138,18 +125,7 @@ public class TrebuchetProjectile extends AbstractSiegeProjectile {
                         float hardness = state.getHardness(serverWorld, pos);
                         if (state.isAir() || hardness < 0) continue;
 
-                        float previousDamage = abstractSiegeEntity.blockDamageMap.getOrDefault(pos, 0.0f);
-
-                        float newDamage = previousDamage + (1.0f / (hardness * (60f / (float) getDamage()) * ((float) effectiveRadius / baseRadius)));
-
-                        if (newDamage >= 1.0f) {
-                            serverWorld.breakBlock(pos, true);
-                            abstractSiegeEntity.blockDamageMap.remove(pos);
-                            clearBlockBreakingProgress(serverWorld, pos);
-                        } else {
-                            abstractSiegeEntity.blockDamageMap.put(pos, newDamage);
-                            sendBlockBreakingProgress(serverWorld, pos, newDamage);
-                        }
+                        BlockDamageTracker.damageBlock(serverWorld, pos, 1.0f / (40f / (float) getDamage()) * ((float) baseRadius / effectiveRadius), hardness);
                     }
                 }
             }
@@ -206,44 +182,6 @@ public class TrebuchetProjectile extends AbstractSiegeProjectile {
         cloud.addEffect(getStatusEffectInstance());
 
         world.spawnEntity(cloud);
-    }
-
-    private void cleanInvalidBlockDamages(AbstractSiegeEntity abstractSiegeEntity) {
-        if (!(this.getWorld() instanceof ServerWorld serverWorld)) return;
-
-        abstractSiegeEntity.blockDamageMap.entrySet().removeIf(entry -> {
-            BlockPos pos = entry.getKey();
-            BlockState state = serverWorld.getBlockState(pos);
-
-            // If block is air (i.e., broken), clean it up
-            if (state.isAir()) {
-                clearBlockBreakingProgress(serverWorld, pos);
-                return true;
-            }
-            return false;
-        });
-    }
-
-    private void sendBlockBreakingProgress(ServerWorld world, BlockPos pos, float progress) {
-        int stage = (int)(progress * 10); // 0–9
-        if (stage > 9) stage = 9;
-
-        for (ServerPlayerEntity player : world.getPlayers()) {
-            int visualId = getBlockVisualId(pos);
-            player.networkHandler.sendPacket(new BlockBreakingProgressS2CPacket(visualId, pos, stage));
-        }
-    }
-
-    private void clearBlockBreakingProgress(ServerWorld world, BlockPos pos) {
-        for (ServerPlayerEntity player : world.getPlayers()) {
-            int visualId = getBlockVisualId(pos);
-            player.networkHandler.sendPacket(new BlockBreakingProgressS2CPacket(visualId, pos, -1));
-        }
-    }
-
-    private int getBlockVisualId(BlockPos pos) {
-        // Offset the ID with hash to make it unique for each block
-        return this.getId() ^ Long.hashCode(pos.asLong());
     }
 
     public StatusEffectInstance getStatusEffectInstance() {

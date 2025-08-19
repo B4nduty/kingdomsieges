@@ -1,5 +1,6 @@
 package banduty.kingdomsieges.entity.custom.sieges;
 
+import banduty.kingdomsieges.Kingdomsieges;
 import banduty.kingdomsieges.entity.ModEntities;
 import banduty.kingdomsieges.entity.custom.projectiles.TrebuchetProjectile;
 import banduty.kingdomsieges.sounds.ModSounds;
@@ -252,8 +253,7 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
         Vec3d direction = new Vec3d(x, 0, z).normalize();
         projectile.setVelocity(direction.multiply(blocksPerTick));
 
-        float damage = 42.0F;
-        projectile.setDamage(damage);
+        projectile.setDamage(Kingdomsieges.getConfig().siegeEnginesOptions.trebuchetBaseDamage());
         projectile.setDamageType(SCDamageCalculator.DamageType.BLUDGEONING);
         projectile.setOwner(this);
 
@@ -273,32 +273,6 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
         serverWorld.spawnEntity(projectile);
 
         setAmmoLoaded("");
-
-//        serverWorld.getPlayers().forEach(p -> {
-//            double distance = p.getPos().distanceTo(this.getPos());
-//
-//            if (distance <= 200) {
-//                float closeVolume;
-//                float distantVolume = 0f;
-//
-//                if (distance <= 50) {
-//                    closeVolume = 1.0f;
-//                } else {
-//                    float t = (float)((distance - 50) / 150.0); // normalize 51–200 -> 0–1
-//                    closeVolume = 1.0f - t;                     // fades out
-//                    distantVolume = t;                          // fades in
-//                }
-//
-//                if (closeVolume > 0f) {
-//                    p.playSound(ModSounds.CANNON_CLOSE.get(), SoundCategory.AMBIENT, closeVolume, 1.0f);
-//                }
-//
-//                if (distantVolume > 0f) {
-//                    p.playSound(ModSounds.CANNON_DISTANT.get(), SoundCategory.AMBIENT, distantVolume, 1.0f);
-//                }
-//            }
-//        });
-
     }
 
     @Override

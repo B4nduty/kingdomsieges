@@ -41,7 +41,7 @@ public class KSItemGroups {
         ));
     }
 
-    private static void siegeMachines(ItemGroup.DisplayContext ctx, ItemGroup.Entries stacks) {
+    private static void siegeEngines(ItemGroup.DisplayContext ctx, ItemGroup.Entries stacks) {
         stacks.addAll(List.of(
                 itemStack(KSItems.CANNON_SPAWNER.get()),
                 itemStack(KSItems.BATTERING_RAM_SPAWNER.get()),
@@ -52,10 +52,10 @@ public class KSItemGroups {
         ));
     }
 
-    public static final ItemGroupTab KS_SIEGE_MACHINES_TAB = new ItemGroupTab(
+    public static final ItemGroupTab KS_SIEGE_ENGINES_TAB = new ItemGroupTab(
             Icon.of(KSItems.CANNON_SPAWNER.get()),
-            Text.translatable("text.itemgroup.kingdomsieges.tab.ks_siege_machines").formatted(Formatting.WHITE),
-            KSItemGroups::siegeMachines,
+            Text.translatable("text.itemgroup.kingdomsieges.tab.ks_siege_engines").formatted(Formatting.WHITE),
+            KSItemGroups::siegeEngines,
             TABS,
             true
     );
@@ -77,7 +77,7 @@ public class KSItemGroups {
             .build();
 
     private static void initializeGroup(OwoItemGroup group) {
-        group.tabs.add(KS_SIEGE_MACHINES_TAB);
+        group.tabs.add(KS_SIEGE_ENGINES_TAB);
         group.tabs.add(KS_ITEMS_TAB);
         group.addButton(LinkButton.discord("https://discord.gg/AbtCqntN9S"));
     }

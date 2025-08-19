@@ -230,7 +230,7 @@ public class RibauldequinEntity extends AbstractSiegeEntity implements GeoEntity
         Vec3d velocity = direction.multiply(blocksPerTick);
         projectile.setVelocity(velocity);
 
-        projectile.setDamage(22.0F);
+        projectile.setDamage(Kingdomsieges.getConfig().siegeEnginesOptions.ribauldequinBaseDamage());
         projectile.setDamageType(SCDamageCalculator.DamageType.BLUDGEONING);
         projectile.setOwner(this);
         projectile.setShouldBreakBlocks(false);

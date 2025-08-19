@@ -20,7 +20,7 @@ public class ModEntities {
             ENTITY_TYPES.register("cannon_entity", () ->
                     FabricEntityTypeBuilder.create(SpawnGroup.MISC, CannonEntity::new)
                             .dimensions(EntityDimensions.fixed(2.0f, 1.5f))
-                            .trackRangeBlocks(Kingdomsieges.getConfig().cannonRange())
+                            .trackRangeBlocks(Kingdomsieges.getConfig().clientOptions.cannonRange())
                             .trackedUpdateRate(1)
                             .build()
             );
@@ -29,7 +29,7 @@ public class ModEntities {
             ENTITY_TYPES.register("ribauldequin_entity", () ->
                     FabricEntityTypeBuilder.create(SpawnGroup.MISC, RibauldequinEntity::new)
                             .dimensions(EntityDimensions.fixed(2.0f, 1.5f))
-                            .trackRangeBlocks(Kingdomsieges.getConfig().ribauldequinRange())
+                            .trackRangeBlocks(Kingdomsieges.getConfig().clientOptions.ribauldequinRange())
                             .trackedUpdateRate(1)
                             .build()
             );
@@ -38,7 +38,7 @@ public class ModEntities {
             ENTITY_TYPES.register("battering_ram_entity", () ->
                     FabricEntityTypeBuilder.create(SpawnGroup.MISC, BatteringRamEntity::new)
                             .dimensions(EntityDimensions.fixed(2.5f, 2.5f))
-                            .trackRangeBlocks(Kingdomsieges.getConfig().batteringRamRange())
+                            .trackRangeBlocks(Kingdomsieges.getConfig().clientOptions.batteringRamRange())
                             .trackedUpdateRate(1)
                             .build()
             );
@@ -47,7 +47,7 @@ public class ModEntities {
             ENTITY_TYPES.register("mangonel_entity", () ->
                     FabricEntityTypeBuilder.create(SpawnGroup.MISC, MangonelEntity::new)
                             .dimensions(EntityDimensions.fixed(2.8f, 2.5f))
-                            .trackRangeBlocks(Kingdomsieges.getConfig().mangonelRange())
+                            .trackRangeBlocks(Kingdomsieges.getConfig().clientOptions.mangonelRange())
                             .trackedUpdateRate(1)
                             .build()
             );
@@ -56,7 +56,7 @@ public class ModEntities {
             ENTITY_TYPES.register("trebuchet_entity", () ->
                     FabricEntityTypeBuilder.create(SpawnGroup.MISC, TrebuchetEntity::new)
                             .dimensions(EntityDimensions.fixed(4.0f, 3.0f))
-                            .trackRangeBlocks(Kingdomsieges.getConfig().trebuchetRange())
+                            .trackRangeBlocks(Kingdomsieges.getConfig().clientOptions.trebuchetRange())
                             .trackedUpdateRate(1)
                             .build()
             );
@@ -65,7 +65,7 @@ public class ModEntities {
             ENTITY_TYPES.register("mantlet_entity", () ->
                     FabricEntityTypeBuilder.create(SpawnGroup.MISC, MantletEntity::new)
                             .dimensions(EntityDimensions.fixed(2.5f, 2f))
-                            .trackRangeBlocks(Kingdomsieges.getConfig().mantletRange())
+                            .trackRangeBlocks(Kingdomsieges.getConfig().clientOptions.mantletRange())
                             .trackedUpdateRate(1)
                             .build()
             );
@@ -74,7 +74,7 @@ public class ModEntities {
             ENTITY_TYPES.register("cannon_ball", () ->
                     FabricEntityTypeBuilder.<CannonProjectile>create(SpawnGroup.MISC, CannonProjectile::new)
                             .dimensions(EntityDimensions.fixed(0.25f, 0.25f))
-                            .trackRangeBlocks(Kingdomsieges.getConfig().cannonBallRange())
+                            .trackRangeBlocks(Kingdomsieges.getConfig().clientOptions.cannonBallRange())
                             .trackedUpdateRate(1)
                             .build()
             );
@@ -83,7 +83,7 @@ public class ModEntities {
             ENTITY_TYPES.register("trebuchet_projectile", () ->
                     FabricEntityTypeBuilder.<TrebuchetProjectile>create(SpawnGroup.MISC, TrebuchetProjectile::new)
                             .dimensions(EntityDimensions.fixed(0.25f, 0.25f))
-                            .trackRangeBlocks(Kingdomsieges.getConfig().trebuchetProjectileRange())
+                            .trackRangeBlocks(Kingdomsieges.getConfig().clientOptions.trebuchetProjectileRange())
                             .trackedUpdateRate(1)
                             .build()
             );

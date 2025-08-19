@@ -1,10 +1,12 @@
 package banduty.kingdomsieges.entity.custom.sieges;
 
+import banduty.kingdomsieges.Kingdomsieges;
 import banduty.kingdomsieges.sounds.ModSounds;
 import banduty.stoneycore.entity.custom.AbstractSiegeEntity;
 import banduty.stoneycore.lands.util.Land;
 import banduty.stoneycore.lands.util.LandState;
 import banduty.stoneycore.siege.SiegeManager;
+import banduty.stoneycore.util.BlockDamageTracker;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -16,9 +18,7 @@ import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.passive.HorseEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.s2c.play.BlockBreakingProgressS2CPacket;
 import net.minecraft.network.packet.s2c.play.StopSoundS2CPacket;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.ActionResult;
@@ -175,7 +175,7 @@ public class BatteringRamEntity extends AbstractSiegeEntity implements GeoEntity
 
         this.setCooldown(this.getCooldown() - 1);
 
-        cleanInvalidBlockDamages();
+        BlockDamageTracker.clean(serverWorld);
 
         if (this.getCooldown() <= 6 && !this.getAttackHappened()) {
             // Destroy blocks in front
@@ -218,6 +218,8 @@ public class BatteringRamEntity extends AbstractSiegeEntity implements GeoEntity
         Vec3d boxCenter = new Vec3d(baseX + 0.5, baseY, baseZ + 0.5);
         Vec3d knockbackDir = this.getRotationVec(1.0F).normalize().multiply(2.5);
 
+        float baseDamage = Kingdomsieges.getConfig().siegeEnginesOptions.batteringRamBaseDamage();
+
         serverWorld.getOtherEntities(this,
                 new Box(
                         boxCenter.x - radius, boxCenter.y - 1, boxCenter.z - radius,
@@ -225,7 +227,7 @@ public class BatteringRamEntity extends AbstractSiegeEntity implements GeoEntity
                 ),
                 entity -> entity instanceof LivingEntity && !(entity instanceof PlayerEntity playerEntity && playerEntity.isCreative())
         ).forEach(entity -> {
-            entity.damage(serverWorld.getDamageSources().mobAttack((LivingEntity) this.getOwner()), 18.0f);
+            entity.damage(serverWorld.getDamageSources().mobAttack((LivingEntity) this.getOwner()), baseDamage);
             Vec3d knockback = new Vec3d(knockbackDir.x, 0.25, knockbackDir.z);
             entity.addVelocity(knockback);
             entity.velocityModified = true;
@@ -240,60 +242,12 @@ public class BatteringRamEntity extends AbstractSiegeEntity implements GeoEntity
                     if (state.isAir() || state.getHardness(serverWorld, pos) < 0) continue;
 
                     float hardness = state.getHardness(serverWorld, pos);
-                    float previousDamage = blockDamageMap.getOrDefault(pos, 0.0f);
+                    float damageFactor = 1.0f / (40 / baseDamage);
 
-                    float newDamage = previousDamage + (1.0f / (hardness * (60/18.0f)));
-
-                    if (newDamage >= 1.0f) {
-                        serverWorld.breakBlock(pos, true);
-                        blockDamageMap.remove(pos);
-                        clearBlockBreakingProgress(serverWorld, pos);
-                    } else {
-                        blockDamageMap.put(pos, newDamage);
-                        sendBlockBreakingProgress(serverWorld, pos, newDamage);
-                    }
+                    BlockDamageTracker.damageBlock(serverWorld, pos, damageFactor, hardness);
                 }
             }
         }
-    }
-
-
-    private void cleanInvalidBlockDamages() {
-        if (!(this.getWorld() instanceof ServerWorld serverWorld)) return;
-
-        blockDamageMap.entrySet().removeIf(entry -> {
-            BlockPos pos = entry.getKey();
-            BlockState state = serverWorld.getBlockState(pos);
-
-            // If block is air (i.e., broken), clean it up
-            if (state.isAir()) {
-                clearBlockBreakingProgress(serverWorld, pos);
-                return true;
-            }
-            return false;
-        });
-    }
-
-    private void sendBlockBreakingProgress(ServerWorld world, BlockPos pos, float progress) {
-        int stage = (int)(progress * 10); // 0–9
-        if (stage > 9) stage = 9;
-
-        for (ServerPlayerEntity player : world.getPlayers()) {
-            int visualId = getBlockVisualId(pos);
-            player.networkHandler.sendPacket(new BlockBreakingProgressS2CPacket(visualId, pos, stage));
-        }
-    }
-
-    private void clearBlockBreakingProgress(ServerWorld world, BlockPos pos) {
-        for (ServerPlayerEntity player : world.getPlayers()) {
-            int visualId = getBlockVisualId(pos);
-            player.networkHandler.sendPacket(new BlockBreakingProgressS2CPacket(visualId, pos, -1));
-        }
-    }
-
-    private int getBlockVisualId(BlockPos pos) {
-        // Offset the ID with hash to make it unique for each block
-        return this.getId() ^ Long.hashCode(pos.asLong());
     }
 
     @Override

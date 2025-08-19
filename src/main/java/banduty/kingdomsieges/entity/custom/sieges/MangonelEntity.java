@@ -1,5 +1,6 @@
 package banduty.kingdomsieges.entity.custom.sieges;
 
+import banduty.kingdomsieges.Kingdomsieges;
 import banduty.kingdomsieges.entity.ModEntities;
 import banduty.kingdomsieges.entity.custom.projectiles.TrebuchetProjectile;
 import banduty.kingdomsieges.sounds.ModSounds;
@@ -209,8 +210,7 @@ public class MangonelEntity extends AbstractSiegeEntity implements GeoEntity {
         Vec3d direction = new Vec3d(x, 0, z).normalize();
         projectile.setVelocity(direction.multiply(blocksPerTick));
 
-        float damage = 27.0F;
-        projectile.setDamage(damage);
+        projectile.setDamage(Kingdomsieges.getConfig().siegeEnginesOptions.mangonelBaseDamage());
         projectile.setDamageType(SCDamageCalculator.DamageType.BLUDGEONING);
         projectile.setOwner(this);
 

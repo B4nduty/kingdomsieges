@@ -200,8 +200,7 @@ public class CannonEntity extends AbstractSiegeEntity implements GeoEntity {
         Vec3d velocity = direction.multiply(blocksPerTick);
         projectile.setVelocity(velocity);
 
-        float damage = 30.0F;
-        projectile.setDamage(damage);
+        projectile.setDamage(Kingdomsieges.getConfig().siegeEnginesOptions.cannonBaseDamage());
         projectile.setDamageType(SCDamageCalculator.DamageType.BLUDGEONING);
         projectile.setOwner(this);
 
