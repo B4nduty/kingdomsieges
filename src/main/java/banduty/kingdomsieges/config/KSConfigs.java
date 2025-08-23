@@ -19,13 +19,6 @@ public class KSConfigs {
         NEVER, EVERY_INGAME_HOUR, TWELVE_INGAME_HOURS, EVERY_HOUR, TWELVE_HOURS;
     }
 
-    @Sync(Option.SyncMode.INFORM_SERVER)
-    @RestartRequired
-    @Comment("""
-            Price formula for extending the Kingdom
-            """)
-    public String expandFormula = "radius - 24";
-
     @Nest
     public SiegeEnginesOptions siegeEnginesOptions = new SiegeEnginesOptions();
     public static class SiegeEnginesOptions {

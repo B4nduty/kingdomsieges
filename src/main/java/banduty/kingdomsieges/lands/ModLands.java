@@ -23,7 +23,7 @@ public class ModLands {
                         Items.EMERALD, 1,
                         Items.EMERALD_BLOCK, 9
                 ),
-                Kingdomsieges.getConfig().expandFormula(),
+                "radius - 24",
                 LandType.TerrainType.GROUND
         );
 

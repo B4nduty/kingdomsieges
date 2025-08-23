@@ -1,6 +1,5 @@
 package banduty.kingdomsieges.entity.custom.sieges;
 
-import banduty.kingdomsieges.Kingdomsieges;
 import banduty.kingdomsieges.sounds.ModSounds;
 import banduty.stoneycore.entity.custom.AbstractSiegeEntity;
 import banduty.stoneycore.lands.util.Land;
@@ -137,10 +136,8 @@ public class MantletEntity extends AbstractSiegeEntity implements GeoEntity {
                     mobEntity.detachLeash(true, false);
                     mobEntity.stopRiding();
                     mobEntity.startRiding(this);
-                    Kingdomsieges.LOGGER.info("Pick Up 1");
                     this.stopTriggeredAnimation("anim_controller", "set_up");
                     this.triggerAnim("anim_controller", "pick_up");
-                    this.setCooldown(15);
                     return ActionResult.SUCCESS;
                 }
             }
@@ -150,9 +147,9 @@ public class MantletEntity extends AbstractSiegeEntity implements GeoEntity {
 
         if (this.canAddPassenger(player) && !player.isSneaking()) {
             player.startRiding(this);
+            this.setOwner(player);
             this.stopTriggeredAnimation("anim_controller", "set_up");
             this.triggerAnim("anim_controller", "pick_up");
-            Kingdomsieges.LOGGER.info("Pick Up 2");
             return ActionResult.SUCCESS;
         }
 
