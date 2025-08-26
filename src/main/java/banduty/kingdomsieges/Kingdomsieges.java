@@ -2,6 +2,7 @@ package banduty.kingdomsieges;
 
 import banduty.kingdomsieges.config.KingdomSiegesConfig;
 import banduty.kingdomsieges.datagen.ModModelProvider;
+import banduty.kingdomsieges.datagen.ModRecipeProvider;
 import banduty.kingdomsieges.entity.ModEntities;
 import banduty.kingdomsieges.entity.custom.sieges.*;
 import banduty.kingdomsieges.events.EndWorldTickHandler;
@@ -54,6 +55,7 @@ public class Kingdomsieges implements ModInitializer, DataGeneratorEntrypoint {
 		FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
 
 		pack.addProvider(ModModelProvider::new);
+		pack.addProvider(ModRecipeProvider::new);
 	}
 
 	public static KingdomSiegesConfig getConfig() {

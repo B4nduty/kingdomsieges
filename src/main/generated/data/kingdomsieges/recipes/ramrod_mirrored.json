@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "L": {
+      "tag": "minecraft:logs"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "pattern": [
+    "  L",
+    " S ",
+    "S  "
+  ],
+  "result": {
+    "item": "kingdomsieges:ramrod"
+  },
+  "show_notification": true
+}
