@@ -73,6 +73,7 @@
   "text.config.kingdomsieges.enum.choices.twelve_hours": "Twelve Hours",
   "text.config.kingdomsieges.option.expandFormula": "Price formula for extending the Kingdom",
 
+  "text.config.kingdomsieges.section.clientOptions": "Client Options",
   "text.config.kingdomsieges.category.clientOptions": "Client Options",
   "text.config.kingdomsieges.option.clientOptions.cannonRange": "Cannon Entity Range Render",
   "text.config.kingdomsieges.option.clientOptions.ribauldequinRange": "Ribauldequin Entity Range Render",
@@ -83,6 +84,7 @@
   "text.config.kingdomsieges.option.clientOptions.cannonBallRange": "Cannon Ball Entity Range Render",
   "text.config.kingdomsieges.option.clientOptions.trebuchetProjectileRange": "Trebuchet Projectile Entity Range Render",
 
+  "text.config.kingdomsieges.section.siegeEnginesOptions": "Siege Engine Options",
   "text.config.kingdomsieges.category.siegeEnginesOptions": "Siege Engine Options",
   "text.config.kingdomsieges.option.siegeEnginesOptions.batteringRamBaseDamage": "Cannon Entity Range Render",
   "text.config.kingdomsieges.option.siegeEnginesOptions.cannonBaseDamage": "Ribauldequin Entity Range Render",

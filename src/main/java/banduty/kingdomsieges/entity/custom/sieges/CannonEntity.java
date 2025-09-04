@@ -170,15 +170,15 @@ public class CannonEntity extends AbstractSiegeEntity implements GeoEntity {
 
         if (getLoadStage() == 5 && getFirstPassenger() == null) {
             this.setOwner(player);
-            fireCannon(player, serverWorld);
+            fireCannon(serverWorld);
         }
 
         return ActionResult.SUCCESS;
     }
 
-    private void fireCannon(PlayerEntity player, ServerWorld serverWorld) {
+    private void fireCannon(ServerWorld serverWorld) {
         triggerAnim("anim_controller", "fire");
-        CannonProjectile projectile = new CannonProjectile(ModEntities.CANNON_BALL.get(), player, serverWorld);
+        CannonProjectile projectile = new CannonProjectile(ModEntities.CANNON_BALL.get(), this, serverWorld);
 
         Vec3d mouthPos = getMouthOffset();
 
@@ -282,7 +282,7 @@ public class CannonEntity extends AbstractSiegeEntity implements GeoEntity {
 
         boolean isMoving = this.getVelocity().x != 0 || this.getVelocity().y != 0;
 
-        if (isMoving) {
+        if (isMoving && isAlive()) {
             if (this.moveTick >= 140 || this.moveTick == 0) {
                 serverWorld.getPlayers().forEach(p -> {
                     if (p.getPos().distanceTo(this.getPos()) <= 30) {
@@ -292,7 +292,7 @@ public class CannonEntity extends AbstractSiegeEntity implements GeoEntity {
                 if (this.moveTick != 0) this.moveTick = 0;
             }
             moveTick++;
-        } else if (this.moveTick != 0) {
+        } else if (this.moveTick != 0 || !isAlive()) {
             this.moveTick = 0;
             serverWorld.getPlayers().forEach(p -> {
                 p.networkHandler.sendPacket(new StopSoundS2CPacket(ModSounds.SIEGE_ENGINE_MOVE.get().getId(), SoundCategory.AMBIENT));

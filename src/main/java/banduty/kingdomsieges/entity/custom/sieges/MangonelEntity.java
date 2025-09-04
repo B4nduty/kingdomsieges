@@ -252,7 +252,7 @@ public class MangonelEntity extends AbstractSiegeEntity implements GeoEntity {
 
         boolean isMoving = this.getVelocity().x != 0 || this.getVelocity().y != 0;
 
-        if (isMoving) {
+        if (isMoving && isAlive()) {
             if (this.moveTick >= 150 || this.moveTick == 0) {
                 serverWorld.getPlayers().forEach(p -> {
                     if (p.getPos().distanceTo(this.getPos()) <= 30) {
@@ -262,7 +262,7 @@ public class MangonelEntity extends AbstractSiegeEntity implements GeoEntity {
                 if (this.moveTick != 0) this.moveTick = 0;
             }
             moveTick++;
-        } else if (this.moveTick != 0) {
+        } else if (this.moveTick != 0 || !isAlive()) {
             this.moveTick = 0;
             serverWorld.getPlayers().forEach(p -> {
                 p.networkHandler.sendPacket(new StopSoundS2CPacket(ModSounds.SIEGE_ENGINE_MOVE.get().getId(), SoundCategory.AMBIENT));

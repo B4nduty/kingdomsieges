@@ -20,6 +20,7 @@ public class KSConfigs {
     }
 
     @Nest
+    @SectionHeader("siegeEnginesOptions")
     public SiegeEnginesOptions siegeEnginesOptions = new SiegeEnginesOptions();
     public static class SiegeEnginesOptions {
         @Sync(Option.SyncMode.INFORM_SERVER)
@@ -54,6 +55,7 @@ public class KSConfigs {
     }
 
     @Nest
+    @SectionHeader("clientOptions")
     public ClientOptions clientOptions = new ClientOptions();
     public static class ClientOptions {
         @Sync(Option.SyncMode.NONE)

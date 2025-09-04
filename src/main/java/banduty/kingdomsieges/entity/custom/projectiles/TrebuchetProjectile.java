@@ -79,10 +79,10 @@ public class TrebuchetProjectile extends AbstractSiegeProjectile {
 
         int baseRadius = Math.max(1, (int) (getDamage() / 8));
         World world = this.getWorld();
-        if (!(world instanceof ServerWorld serverWorld) || !(this.getOwner() instanceof AbstractSiegeEntity abstractSiegeEntity)) return;
+        if (!(world instanceof ServerWorld serverWorld) || !(this.getOwner() instanceof AbstractSiegeEntity)) return;
 
         switch (getImpactMode()) {
-            case BREAK_BLOCKS -> handleBlockBreaking(blockHitResult, serverWorld, abstractSiegeEntity, baseRadius);
+            case BREAK_BLOCKS -> handleBlockBreaking(blockHitResult, serverWorld, baseRadius);
             case SPREAD_FIRE -> handleSpreadFire(blockHitResult, serverWorld, baseRadius);
             case SPREAD_EFFECT -> handleSpreadEffect(blockHitResult, serverWorld, baseRadius);
         }
@@ -96,7 +96,7 @@ public class TrebuchetProjectile extends AbstractSiegeProjectile {
         this.discard();
     }
 
-    private void handleBlockBreaking(BlockHitResult blockHitResult, ServerWorld serverWorld, AbstractSiegeEntity abstractSiegeEntity, int baseRadius) {
+    private void handleBlockBreaking(BlockHitResult blockHitResult, ServerWorld serverWorld, int baseRadius) {
         BlockPos centerPos = blockHitResult.getBlockPos();
 
         Random random = new Random();
