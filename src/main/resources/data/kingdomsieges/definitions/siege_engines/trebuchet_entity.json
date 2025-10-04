@@ -1,0 +1,6 @@
+{
+  "baseDamage": 26.0,
+  "baseReload": 200.0,
+  "projectileSpeed": 100.0,
+  "accuracyMultiplier": 0.25
+}

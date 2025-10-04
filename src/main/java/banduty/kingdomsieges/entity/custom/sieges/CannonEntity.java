@@ -5,7 +5,6 @@ import banduty.kingdomsieges.entity.ModEntities;
 import banduty.kingdomsieges.entity.custom.projectiles.CannonProjectile;
 import banduty.kingdomsieges.items.KSItems;
 import banduty.kingdomsieges.sounds.ModSounds;
-import banduty.stoneycore.StoneyCore;
 import banduty.stoneycore.entity.custom.AbstractSiegeEntity;
 import banduty.stoneycore.items.SCItems;
 import banduty.stoneycore.lands.util.Land;
@@ -184,9 +183,8 @@ public class CannonEntity extends AbstractSiegeEntity implements GeoEntity {
 
         projectile.setPos(mouthPos.x, mouthPos.y, mouthPos.z);
 
-        double blocksPerSecond = 140.0;
-        double blocksPerTick = blocksPerSecond / 20.0;
-        float accuracyDegrees = 1.2f;
+        double blocksPerTick = this.getProjectileSpeed() / 20.0;
+        float accuracyDegrees = getAccuracyMultiplier();
         float yawOffset = (random.nextFloat() - 0.5f) * 4 * accuracyDegrees;
         float pitchOffset = (random.nextFloat() - 0.5f) * 4 * accuracyDegrees;
         float adjustedYaw = this.getBodyYaw() + yawOffset;
@@ -200,7 +198,7 @@ public class CannonEntity extends AbstractSiegeEntity implements GeoEntity {
         Vec3d velocity = direction.multiply(blocksPerTick);
         projectile.setVelocity(velocity);
 
-        projectile.setDamage(Kingdomsieges.getConfig().siegeEnginesOptions.cannonBaseDamage());
+        projectile.setDamage(getBaseDamage());
         projectile.setDamageType(SCDamageCalculator.DamageType.BLUDGEONING);
         projectile.setOwner(this);
 
@@ -312,7 +310,6 @@ public class CannonEntity extends AbstractSiegeEntity implements GeoEntity {
         double up = 1;
         double x = this.getX() - Math.sin(yawRad) * forward;
         double y = this.getY() + up - Math.sin(Math.toRadians(this.getPitch()));
-        StoneyCore.LOGGER.info("Y pos: " + y);
         double z = this.getZ() + Math.cos(yawRad) * forward;
 
         return new Vec3d(x, y, z);
@@ -324,14 +321,6 @@ public class CannonEntity extends AbstractSiegeEntity implements GeoEntity {
             return new Vec3d(0.0, 0.0, -1.5); // Left, Up, Back
         }
         return new Vec3d(0.5, 0.0, 1.0);
-    }
-
-    @Override
-    public double getVelocity(Entity entity) {
-        if (entity instanceof HorseEntity) {
-            return 0.1d;
-        }
-        return 0.05d;
     }
 
     @Override

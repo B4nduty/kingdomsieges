@@ -1,6 +1,5 @@
 package banduty.kingdomsieges.entity.custom.sieges;
 
-import banduty.kingdomsieges.Kingdomsieges;
 import banduty.kingdomsieges.entity.ModEntities;
 import banduty.kingdomsieges.entity.custom.projectiles.TrebuchetProjectile;
 import banduty.kingdomsieges.sounds.ModSounds;
@@ -134,7 +133,7 @@ public class MangonelEntity extends AbstractSiegeEntity implements GeoEntity {
             if (itemStack.isOf(Items.STONE)) {
                 itemStack.decrement(1);
                 setAmmoLoaded("stone");
-                setReloadingTime(100);
+                setReloadingTime(getBaseReload());
                 triggerAnim("anim_controller", "reloading");
                 serverWorld.getPlayers().forEach(p -> {
                     double distance = p.getPos().distanceTo(this.getPos());
@@ -152,7 +151,7 @@ public class MangonelEntity extends AbstractSiegeEntity implements GeoEntity {
             } else if (itemStack.isOf(Items.MAGMA_BLOCK)) {
                 itemStack.decrement(1);
                 setAmmoLoaded("magma");
-                setReloadingTime(100);
+                setReloadingTime(getBaseReload());
                 triggerAnim("anim_controller", "reloading");
                 serverWorld.getPlayers().forEach(p -> {
                     double distance = p.getPos().distanceTo(this.getPos());
@@ -199,9 +198,8 @@ public class MangonelEntity extends AbstractSiegeEntity implements GeoEntity {
 
         projectile.setPos(this.getX(), this.getY() + 2.25d, this.getZ());
 
-        double blocksPerSecond = 80.0;
-        double blocksPerTick = blocksPerSecond / 20.0;
-        float accuracyDegrees = 1f;
+        double blocksPerTick = getProjectileSpeed() / 20.0;
+        float accuracyDegrees = getAccuracyMultiplier();
         float yawOffset = (random.nextFloat() - 0.5f) * 4 * accuracyDegrees;
         float adjustedYaw = this.getBodyYaw() + yawOffset;
         float yawRad = adjustedYaw * (float) (Math.PI / 180.0);
@@ -210,7 +208,7 @@ public class MangonelEntity extends AbstractSiegeEntity implements GeoEntity {
         Vec3d direction = new Vec3d(x, 0, z).normalize();
         projectile.setVelocity(direction.multiply(blocksPerTick));
 
-        projectile.setDamage(Kingdomsieges.getConfig().siegeEnginesOptions.mangonelBaseDamage());
+        projectile.setDamage(getBaseDamage());
         projectile.setDamageType(SCDamageCalculator.DamageType.BLUDGEONING);
         projectile.setOwner(this);
 
@@ -231,7 +229,7 @@ public class MangonelEntity extends AbstractSiegeEntity implements GeoEntity {
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
         controllerRegistrar.add(new AnimationController<>(this,"anim_controller", state -> PlayState.STOP)
                 .triggerableAnim("shoot", shoot)
-                .triggerableAnim("reloading", reloading)
+                .triggerableAnim("reloading", reloading).setAnimationSpeed(100d/getBaseReload())
                 .triggerableAnim("loaded", loaded)
                 .triggerableAnim("unloaded", unloaded));
 
@@ -284,14 +282,6 @@ public class MangonelEntity extends AbstractSiegeEntity implements GeoEntity {
             return new Vec3d(0.0, 0.0, -1.25); // Left, Up, Back
         }
         return new Vec3d(0.0, 0.0, 2.0);
-    }
-
-    @Override
-    public double getVelocity(Entity entity) {
-        if (entity instanceof HorseEntity) {
-            return 0.1d;
-        }
-        return 0.06d;
     }
 
     @Override

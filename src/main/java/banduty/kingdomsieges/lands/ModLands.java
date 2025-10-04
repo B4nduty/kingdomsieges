@@ -11,22 +11,21 @@ import net.minecraft.util.Identifier;
 import java.util.Map;
 
 public class ModLands {
-    public static LandType KINGDOM;
+    public static LandType KINGDOM = LandTypeRegistry.register(
+            new Identifier(Kingdomsieges.MOD_ID, "kingdom"),
+            Blocks.BELL,
+            SCItems.CROWN.get(),
+            25,
+            Map.of(
+                    Items.EMERALD, 1,
+                    Items.EMERALD_BLOCK, 9
+            ),
+            "radius - 24",
+            LandType.TerrainType.GROUND,
+            -1
+    );
 
     public static void registerLands() {
-        KINGDOM = LandTypeRegistry.register(
-                new Identifier(Kingdomsieges.MOD_ID, "kingdom"),
-                Blocks.BELL,
-                SCItems.CROWN.get(),
-                25,
-                Map.of(
-                        Items.EMERALD, 1,
-                        Items.EMERALD_BLOCK, 9
-                ),
-                "radius - 24",
-                LandType.TerrainType.GROUND
-        );
-
         Kingdomsieges.LOGGER.info("Registering Lands for " + Kingdomsieges.MOD_ID);
     }
 }

@@ -1,0 +1,7 @@
+{
+  "playerSpeed": 0.04,
+  "horseSpeed": 0.08,
+  "baseDamage": 32.0,
+  "projectileSpeed": 150.0,
+  "accuracyMultiplier": 1.3
+}

@@ -38,6 +38,6 @@ public class KingdomsiegesClient implements ClientModInitializer {
         EntityRendererRegistry.register(ModEntities.TREBUCHET_PROJECTILE.get(), TrebuchetProjectileRenderer::new);
         EntityRendererRegistry.register(ModEntities.MANTLET_ENTITY.get(), MantletRenderer::new);
 
-        BipedEntityModelAnglesEvents.BEFORE.register(new BipedEntityModelAnglesHandler());
+        BipedEntityModelAnglesEvents.AFTER.register(new BipedEntityModelAnglesHandler());
     }
 }

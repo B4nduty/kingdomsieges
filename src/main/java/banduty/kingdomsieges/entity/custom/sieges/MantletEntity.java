@@ -211,14 +211,6 @@ public class MantletEntity extends AbstractSiegeEntity implements GeoEntity {
     }
 
     @Override
-    public double getVelocity(Entity entity) {
-        if (entity instanceof HorseEntity) {
-            return 0.02d;
-        }
-        return 0.01d;
-    }
-
-    @Override
     public Vec3d getPlayerPOV() {
         return new Vec3d(0.0, -0.7f, 0.0);
     }

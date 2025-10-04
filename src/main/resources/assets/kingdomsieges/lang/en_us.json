@@ -82,13 +82,5 @@
   "text.config.kingdomsieges.option.clientOptions.trebuchetRange": "Trebuchet Entity Range Render",
   "text.config.kingdomsieges.option.clientOptions.mantletRange": "Mantlet Entity Range Render",
   "text.config.kingdomsieges.option.clientOptions.cannonBallRange": "Cannon Ball Entity Range Render",
-  "text.config.kingdomsieges.option.clientOptions.trebuchetProjectileRange": "Trebuchet Projectile Entity Range Render",
-
-  "text.config.kingdomsieges.section.siegeEnginesOptions": "Siege Engine Options",
-  "text.config.kingdomsieges.category.siegeEnginesOptions": "Siege Engine Options",
-  "text.config.kingdomsieges.option.siegeEnginesOptions.batteringRamBaseDamage": "Cannon Entity Range Render",
-  "text.config.kingdomsieges.option.siegeEnginesOptions.cannonBaseDamage": "Ribauldequin Entity Range Render",
-  "text.config.kingdomsieges.option.siegeEnginesOptions.mangonelBaseDamage": "Battering Ram Entity Range Render",
-  "text.config.kingdomsieges.option.siegeEnginesOptions.ribauldequinBaseDamage": "Mangonel Entity Range Render",
-  "text.config.kingdomsieges.option.siegeEnginesOptions.trebuchetBaseDamage": "Trebuchet Entity Range Render"
+  "text.config.kingdomsieges.option.clientOptions.trebuchetProjectileRange": "Trebuchet Projectile Entity Range Render"
 }

@@ -8,9 +8,10 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-public class BipedEntityModelAnglesHandler implements BipedEntityModelAnglesEvents.Before {
+public class BipedEntityModelAnglesHandler implements BipedEntityModelAnglesEvents.After {
     @Override
-    public void beforeSetAngles(BipedEntityModel<?> model, LivingEntity entity, AbstractSiegeEntity abstractSiegeEntity, float limbAngle, float limbDistance, float age, float headYaw, float headPitch, CallbackInfo ci) {
+    public void afterSetAngles(BipedEntityModel<?> model, LivingEntity entity, float limbAngle, float limbDistance, float age, float headYaw, float headPitch, CallbackInfo ci) {
+        if (!(entity.getVehicle() instanceof AbstractSiegeEntity abstractSiegeEntity)) return;
         if (abstractSiegeEntity instanceof CannonEntity) {
             float movement = (float) Math.sqrt(abstractSiegeEntity.getVelocity().x * abstractSiegeEntity.getVelocity().x + abstractSiegeEntity.getVelocity().z * abstractSiegeEntity.getVelocity().z);
             float stepSpeed = 0.1F; // Lower = slower steps

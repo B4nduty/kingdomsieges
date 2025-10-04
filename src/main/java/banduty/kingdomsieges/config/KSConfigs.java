@@ -20,41 +20,6 @@ public class KSConfigs {
     }
 
     @Nest
-    @SectionHeader("siegeEnginesOptions")
-    public SiegeEnginesOptions siegeEnginesOptions = new SiegeEnginesOptions();
-    public static class SiegeEnginesOptions {
-        @Sync(Option.SyncMode.INFORM_SERVER)
-        @Comment("""
-            Battering Ram Base Damage
-            """)
-        public float batteringRamBaseDamage = 16;
-
-        @Sync(Option.SyncMode.INFORM_SERVER)
-        @Comment("""
-            Cannon Base Damage
-            """)
-        public float cannonBaseDamage = 34;
-
-        @Sync(Option.SyncMode.INFORM_SERVER)
-        @Comment("""
-            Mangonel Base Damage
-            """)
-        public float mangonelBaseDamage = 20;
-
-        @Sync(Option.SyncMode.INFORM_SERVER)
-        @Comment("""
-            Ribauldequin Base Damage
-            """)
-        public float ribauldequinBaseDamage = 32;
-
-        @Sync(Option.SyncMode.INFORM_SERVER)
-        @Comment("""
-            Trebuchet Base Damage
-            """)
-        public float trebuchetBaseDamage = 26;
-    }
-
-    @Nest
     @SectionHeader("clientOptions")
     public ClientOptions clientOptions = new ClientOptions();
     public static class ClientOptions {

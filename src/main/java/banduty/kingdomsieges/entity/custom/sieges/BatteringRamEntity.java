@@ -1,6 +1,5 @@
 package banduty.kingdomsieges.entity.custom.sieges;
 
-import banduty.kingdomsieges.Kingdomsieges;
 import banduty.kingdomsieges.sounds.ModSounds;
 import banduty.stoneycore.entity.custom.AbstractSiegeEntity;
 import banduty.stoneycore.lands.util.Land;
@@ -218,7 +217,7 @@ public class BatteringRamEntity extends AbstractSiegeEntity implements GeoEntity
         Vec3d boxCenter = new Vec3d(baseX + 0.5, baseY, baseZ + 0.5);
         Vec3d knockbackDir = this.getRotationVec(1.0F).normalize().multiply(2.5);
 
-        float baseDamage = Kingdomsieges.getConfig().siegeEnginesOptions.batteringRamBaseDamage();
+        float baseDamage = (float) getBaseDamage();
 
         serverWorld.getOtherEntities(this,
                 new Box(
@@ -256,14 +255,6 @@ public class BatteringRamEntity extends AbstractSiegeEntity implements GeoEntity
             return new Vec3d(0.0, 0.0, -1.25); // Left, Up, Back
         }
         return new Vec3d(0.0, 0.0, 1.25);
-    }
-
-    @Override
-    public double getVelocity(Entity entity) {
-        if (entity instanceof HorseEntity) {
-            return 0.07d;
-        }
-        return 0.025d;
     }
 
     @Override

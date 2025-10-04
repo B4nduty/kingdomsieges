@@ -1,6 +1,5 @@
 package banduty.kingdomsieges.entity.custom.sieges;
 
-import banduty.kingdomsieges.Kingdomsieges;
 import banduty.kingdomsieges.entity.ModEntities;
 import banduty.kingdomsieges.entity.custom.projectiles.TrebuchetProjectile;
 import banduty.kingdomsieges.sounds.ModSounds;
@@ -155,7 +154,7 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
             if (itemStack.isOf(Items.STONE)) {
                 itemStack.decrement(1);
                 setAmmoLoaded("stone");
-                setReloadingTime(200);
+                setReloadingTime(getReloadingTime());
                 triggerAnim("anim_controller", "reload");
                 serverWorld.getPlayers().forEach(p -> {
                     double distance = p.getPos().distanceTo(this.getPos());
@@ -173,7 +172,7 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
             } else if (itemStack.isOf(Items.MAGMA_BLOCK)) {
                 itemStack.decrement(1);
                 setAmmoLoaded("magma");
-                setReloadingTime(200);
+                setReloadingTime(getReloadingTime());
                 triggerAnim("anim_controller", "reload");
                 serverWorld.getPlayers().forEach(p -> {
                     double distance = p.getPos().distanceTo(this.getPos());
@@ -195,7 +194,7 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
                 }
                 itemStack.decrement(9);
                 setAmmoLoaded("rotten_flesh");
-                setReloadingTime(200);
+                setReloadingTime(getReloadingTime());
                 triggerAnim("anim_controller", "reload");
                 serverWorld.getPlayers().forEach(p -> {
                     double distance = p.getPos().distanceTo(this.getPos());
@@ -242,9 +241,8 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
 
         projectile.setPos(this.getX(), this.getY() + 12d, this.getZ());
 
-        double blocksPerSecond = 100.0;
-        double blocksPerTick = blocksPerSecond / 20.0;
-        float accuracyDegrees = 0.25f;
+        double blocksPerTick = getProjectileSpeed() / 20.0;
+        float accuracyDegrees = getAccuracyMultiplier();
         float yawOffset = (random.nextFloat() - 0.5f) * 4 * accuracyDegrees;
         float adjustedYaw = this.getBodyYaw() + yawOffset;
         float yawRad = adjustedYaw * (float) (Math.PI / 180.0);
@@ -253,7 +251,7 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
         Vec3d direction = new Vec3d(x, 0, z).normalize();
         projectile.setVelocity(direction.multiply(blocksPerTick));
 
-        projectile.setDamage(Kingdomsieges.getConfig().siegeEnginesOptions.trebuchetBaseDamage());
+        projectile.setDamage(getBaseDamage());
         projectile.setDamageType(SCDamageCalculator.DamageType.BLUDGEONING);
         projectile.setOwner(this);
 
@@ -279,7 +277,7 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
         controllerRegistrar.add(new AnimationController<>(this,"anim_controller", state -> PlayState.STOP)
                 .triggerableAnim("shoot", shoot)
-                .triggerableAnim("reload", reload)
+                .triggerableAnim("reload", reload).setAnimationSpeed(200d/getReloadingTime())
                 .triggerableAnim("loaded", loaded)
                 .triggerableAnim("unloaded", unloaded));
 

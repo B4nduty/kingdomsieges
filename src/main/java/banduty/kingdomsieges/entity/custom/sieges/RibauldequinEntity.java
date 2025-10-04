@@ -204,7 +204,7 @@ public class RibauldequinEntity extends AbstractSiegeEntity implements GeoEntity
         CannonProjectile projectile = new CannonProjectile(ModEntities.CANNON_BALL.get(), this, world);
 
         float baseYaw = this.getBodyYaw();
-        float accuracyDegrees = 1.3f;
+        float accuracyDegrees = getAccuracyMultiplier();
         float yawOffset = baseYaw + angleOffset + (random.nextFloat() - 0.5f) * 4 * accuracyDegrees;
         float pitchOffset = this.getPitch() + (random.nextFloat() - 0.5f) * 4 * accuracyDegrees;
 
@@ -216,8 +216,7 @@ public class RibauldequinEntity extends AbstractSiegeEntity implements GeoEntity
         double zDir = Math.cos(yawRad) * Math.cos(pitchRad);
         Vec3d direction = new Vec3d(xDir, yDir, zDir).normalize();
 
-        double blocksPerSecond = 150.0;
-        double blocksPerTick = blocksPerSecond / 20.0;
+        double blocksPerTick = getProjectileSpeed() / 20.0;
 
         float totalYaw = (float) Math.toRadians(this.getBodyYaw() + angleOffset);
 
@@ -230,7 +229,7 @@ public class RibauldequinEntity extends AbstractSiegeEntity implements GeoEntity
         Vec3d velocity = direction.multiply(blocksPerTick);
         projectile.setVelocity(velocity);
 
-        projectile.setDamage(Kingdomsieges.getConfig().siegeEnginesOptions.ribauldequinBaseDamage());
+        projectile.setDamage(getBaseDamage());
         projectile.setDamageType(SCDamageCalculator.DamageType.BLUDGEONING);
         projectile.setOwner(this);
         projectile.setShouldBreakBlocks(false);
@@ -350,14 +349,6 @@ public class RibauldequinEntity extends AbstractSiegeEntity implements GeoEntity
             return new Vec3d(0.0, 0.0, -1.5); // Left, Up, Back
         }
         return new Vec3d(0.5, 0.0, 1.0);
-    }
-
-    @Override
-    public double getVelocity(Entity entity) {
-        if (entity instanceof HorseEntity) {
-            return 0.08d;
-        }
-        return 0.04d;
     }
 
     @Override
