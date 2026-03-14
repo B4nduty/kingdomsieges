@@ -212,7 +212,7 @@ public class CannonEntity extends AbstractSiegeEntity implements GeoEntity {
                 if (distance <= 50) {
                     closeVolume = 1.0f;
                 } else {
-                    float t = (float)((distance - 50) / 150.0); // normalize 51–200 -> 0–1
+                    float t = (float) ((distance - 50) / 150.0); // normalize 51–200 -> 0–1
                     closeVolume = 1.0f - t;                     // fades out
                     distantVolume = t;                          // fades in
                 }
@@ -238,7 +238,7 @@ public class CannonEntity extends AbstractSiegeEntity implements GeoEntity {
                 0.01    // speed
         );
 
-        spawnParticleTrail(serverLevel, velocity.normalize(), mouthPos, ModParticles.MUZZLES_SMOKE_PARTICLE, 100, 0.2f, 0.0005f, 5);
+        spawnParticleTrail(serverLevel, velocity.normalize(), mouthPos, ModParticles.MUZZLES_SMOKE_PARTICLE, 50, 0.2f, 0.0005f, 5);
         spawnParticleTrail(serverLevel, velocity.normalize(), mouthPos, ModParticles.MUZZLES_FLASH_PARTICLE, 1, 0f, 0.1f, 6);
     }
 
@@ -256,7 +256,7 @@ public class CannonEntity extends AbstractSiegeEntity implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-        controllerRegistrar.add(new AnimationController<>(this,"anim_controller", state -> PlayState.STOP)
+        controllerRegistrar.add(new AnimationController<>(this, "anim_controller", state -> PlayState.STOP)
                 .triggerableAnim("fire", fire)
                 .triggerableAnim("loaded", loaded)
                 .triggerableAnim("unloaded", unloaded));
@@ -325,4 +325,5 @@ public class CannonEntity extends AbstractSiegeEntity implements GeoEntity {
     public Vec3 getPlayerPOV() {
         return new Vec3(0.0, 0.0, 0.0);
     }
+
 }

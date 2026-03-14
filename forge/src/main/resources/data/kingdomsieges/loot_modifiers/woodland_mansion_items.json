@@ -2,7 +2,7 @@
   "type": "kingdomsieges:add_structure_items",
   "conditions": [
     {
-      "condition": "minecraft:loot_table_id",
+      "condition": "forge:loot_table_id",
       "loot_table_id": "minecraft:chests/woodland_mansion"
     },
     {
