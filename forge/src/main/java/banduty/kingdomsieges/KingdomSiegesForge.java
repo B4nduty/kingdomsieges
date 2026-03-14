@@ -9,29 +9,38 @@ import banduty.kingdomsieges.lands.ModLands;
 import banduty.kingdomsieges.sounds.ModSounds;
 import banduty.kingdomsieges.structure.ModStructures;
 import banduty.kingdomsieges.util.loottable.ModLootTable;
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
+import me.shedaniel.autoconfig.serializer.PartitioningSerializer;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(Kingdomsieges.MOD_ID)
 public class KingdomSiegesForge {
     public static KSConfigs CONFIG;
-    
+
     public KingdomSiegesForge() {
         Kingdomsieges.init();
 
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        ModEntities.registerEntities();
+        AutoConfig.register(KSConfigs.class, PartitioningSerializer.wrap(JanksonConfigSerializer::new));
+        CONFIG = AutoConfig.getConfigHolder(KSConfigs.class).getConfig();
+
+
+        ModEntities.register(modEventBus);
         KSItems.registerItems(modEventBus);
         KSItemGroups.register(modEventBus);
-        ModLands.registerLands();
         ModLootTable.registerLootTables(modEventBus);
 
-        ModSounds.registerSounds();
+        ModSounds.register(modEventBus);
         ModStructures.registerStructures();
+
+        modEventBus.addListener(this::commonSetup);
     }
 
     @SubscribeEvent
@@ -43,5 +52,11 @@ public class KingdomSiegesForge {
         event.put(ModEntities.MANGONEL_ENTITY.get(), MangonelEntity.createAttributes().build());
         event.put(ModEntities.TREBUCHET_ENTITY.get(), TrebuchetEntity.createAttributes().build());
         event.put(ModEntities.MANTLET_ENTITY.get(), MantletEntity.createAttributes().build());
+    }
+
+    private void commonSetup(final FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> {
+            ModLands.init();
+        });
     }
 }
