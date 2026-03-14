@@ -1,0 +1,55 @@
+{
+  "cannon_close": {
+    "subtitle": "sounds.kingdomsieges.cannon_close",
+    "sounds": [
+      "kingdomsieges:cannon_close_1",
+      "kingdomsieges:cannon_close_2",
+      "kingdomsieges:cannon_close_3"
+    ]
+  },
+  "cannon_distant": {
+    "subtitle": "sounds.kingdomsieges.cannon_distant",
+    "sounds": [
+      "kingdomsieges:cannon_distant_1",
+      "kingdomsieges:cannon_distant_2",
+      "kingdomsieges:cannon_distant_3"
+    ]
+  },
+  "ram_impact": {
+    "subtitle": "sounds.kingdomsieges.ram_impact",
+    "sounds": [
+      "kingdomsieges:ram_impact"
+    ]
+  },
+  "rope_charge_gn": {
+    "subtitle": "sounds.kingdomsieges.rope_charge_gn",
+    "sounds": [
+      "kingdomsieges:rope_charge_gn"
+    ]
+  },
+  "rope_charge_br": {
+    "subtitle": "sounds.kingdomsieges.rope_charge_br",
+    "sounds": [
+      "kingdomsieges:rope_charge_br"
+    ]
+  },
+  "siege_engine_move": {
+    "subtitle": "sounds.kingdomsieges.siege_engine_move",
+    "sounds": [
+      "kingdomsieges:siege_engine_move"
+    ]
+  },
+  "mangonel_shoot": {
+    "subtitle": "sounds.kingdomsieges.mangonel_shoot",
+    "sounds": [
+      "kingdomsieges:mangonel_shoot"
+    ]
+  },
+  "trebuchet_shoot": {
+    "subtitle": "sounds.kingdomsieges.trebuchet_shoot",
+    "sounds": [
+      "kingdomsieges:trebuchet_shoot",
+      "kingdomsieges:trebuchet_shoot_2"
+    ]
+  }
+}

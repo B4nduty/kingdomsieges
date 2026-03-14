@@ -1,0 +1,17 @@
+{
+  "type": "kingdomsieges:add_structure_items",
+  "conditions": [
+    {
+      "condition": "minecraft:loot_table_id",
+      "loot_table_id": "minecraft:chests/village/village_weaponsmith"
+    },
+    {
+      "condition": "minecraft:random_chance",
+      "chance": 0.9
+    }
+  ],
+  "items": [
+    "kingdomsieges:mantlet_manuscript",
+    "kingdomsieges:mangonel_manuscript"
+  ]
+}

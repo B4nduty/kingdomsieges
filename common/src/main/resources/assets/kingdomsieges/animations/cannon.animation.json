@@ -1,0 +1,144 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"fire": {
+			"animation_length": 4.12,
+			"bones": {
+				"base": {
+					"rotation": {
+						"0.04": {
+							"vector": [0, 0, 0]
+						},
+						"0.08": {
+							"vector": [0, 0, 0]
+						},
+						"0.24": {
+							"vector": [0, 0, 0]
+						},
+						"0.32": {
+							"vector": [-2.5, 0, 0]
+						},
+						"0.4": {
+							"vector": [0, 0, 0]
+						}
+					},
+					"position": {
+						"0.04": {
+							"vector": [0, 0, 0]
+						},
+						"0.24": {
+							"vector": [0, 0, 10.94]
+						},
+						"2.64": {
+							"vector": [0, 0, 10.94]
+						},
+						"4.08": {
+							"vector": [0, 0, 0]
+						}
+					}
+				},
+				"cannon": {
+					"rotation": {
+						"0.04": {
+							"vector": [0, 0, 0]
+						},
+						"0.08": {
+							"vector": [-5, 0, 0]
+						},
+						"0.16": {
+							"vector": [0, 0, 0]
+						},
+						"2.64": {
+							"vector": [0, 0, 0]
+						},
+						"2.88": {
+							"vector": [-2.5, 0, 0]
+						},
+						"3.84": {
+							"vector": [-2.5, 0, 0]
+						},
+						"4.08": {
+							"vector": [0, 0, 0]
+						}
+					}
+				},
+				"wheel_left": {
+					"rotation": {
+						"0.04": {
+							"vector": [0, 0, 0]
+						},
+						"0.24": {
+							"vector": [-32.14, 0, 0]
+						},
+						"2.64": {
+							"vector": [-32.14, 0, 0]
+						},
+						"4.12": {
+							"vector": [0, 0, 0]
+						}
+					}
+				},
+				"wheel_right": {
+					"rotation": {
+						"0.04": {
+							"vector": [0, 0, 0]
+						},
+						"0.24": {
+							"vector": [-32.14, 0, 0]
+						},
+						"2.64": {
+							"vector": [-32.14, 0, 0]
+						},
+						"4.12": {
+							"vector": [0, 0, 0]
+						}
+					}
+				},
+				"string": {
+					"scale": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"muzzleflash": {
+					"scale": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.04": {
+							"vector": [2, 2, 2]
+						},
+						"0.08": {
+							"vector": [0, 0, 0]
+						}
+					}
+				}
+			}
+		},
+		"loaded": {
+			"loop": true,
+			"bones": {
+				"muzzleflash": {
+					"scale": {
+						"vector": [0, 0, 0]
+					}
+				}
+			}
+		},
+		"unloaded": {
+			"loop": true,
+			"bones": {
+				"string": {
+					"scale": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"muzzleflash": {
+					"scale": {
+						"vector": [0, 0, 0]
+					}
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}

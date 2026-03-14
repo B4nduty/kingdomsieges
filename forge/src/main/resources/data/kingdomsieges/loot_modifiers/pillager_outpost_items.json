@@ -1,0 +1,17 @@
+{
+  "type": "kingdomsieges:add_structure_items",
+  "conditions": [
+    {
+      "condition": "minecraft:loot_table_id",
+      "loot_table_id": "minecraft:chests/pillager_outpost"
+    },
+    {
+      "condition": "minecraft:random_chance",
+      "chance": 0.75
+    }
+  ],
+  "items": [
+    "kingdomsieges:trebuchet_manuscript",
+    "kingdomsieges:battering_ram_manuscript"
+  ]
+}

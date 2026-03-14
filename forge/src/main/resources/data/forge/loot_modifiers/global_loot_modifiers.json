@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "entries": [
+    "kingdomsieges:village_blacksmith_items",
+    "kingdomsieges:pillager_outpost_items",
+    "kingdomsieges:woodland_mansion_items"
+  ]
+}

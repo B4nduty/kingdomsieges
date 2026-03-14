@@ -1,0 +1,32 @@
+{
+	/* When Land's Bell should Ring
+	   NEVER | EVERY_INGAME_HOUR | TWELVE_INGAME_HOURS | EVERY_HOUR | TWELVE_HOURS
+	*/
+	"bellRingTime": "EVERY_HOUR",
+	"clientOptions": {
+		/* Cannon Entity Range Render
+		*/
+		"cannonRange": 100,
+		/* Ribauldequin Entity Range Render
+		*/
+		"ribauldequinRange": 100,
+		/* Battering Ram Entity Range Render
+		*/
+		"batteringRamRange": 100,
+		/* Mangonel Entity Range Render
+		*/
+		"mangonelRange": 100,
+		/* Trebuchet Entity Range Render
+		*/
+		"trebuchetRange": 100,
+		/* Mantlet Entity Range Render
+		*/
+		"mantletRange": 100,
+		/* Cannon Ball Entity Range Render
+		*/
+		"cannonBallRange": 100,
+		/* Trebuchet Projectile Entity Range Render
+		*/
+		"trebuchetProjectileRange": 100
+	}
+}

@@ -1,0 +1,27 @@
+{
+  "playerSpeed": 0.05,
+  "horseSpeed": 0.1,
+  "baseDamage": 34.0,
+  "projectileSpeed": 140.0,
+  "accuracyMultiplier": 1.2,
+  "damageConfig": {
+    "entityDamageSources": {
+      "minecraft:vindicator": true,
+      "*": false
+    },
+    "itemDamageSources": {
+      "minecraft:wooden_axe": true,
+      "minecraft:stone_axe": true,
+      "minecraft:iron_axe": true,
+      "minecraft:golden_axe": true,
+      "minecraft:diamond_axe": true,
+      "minecraft:netherite_axe": true,
+      "*": false
+    },
+    "damageTypeSources": {
+      "projectile": false,
+      "explosion": true,
+      "*": false
+    }
+  }
+}
