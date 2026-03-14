@@ -41,6 +41,7 @@ public class KingdomSiegesForge {
         ModStructures.registerStructures();
 
         modEventBus.addListener(this::commonSetup);
+        modEventBus.addListener(KingdomSiegesForge::registerAttributes);
     }
 
     @SubscribeEvent
