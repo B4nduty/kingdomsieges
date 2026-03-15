@@ -32,8 +32,8 @@
   },
   "requirements": [
     [
-      "has_logs",
       "has_stick",
+      "has_logs",
       "has_the_recipe"
     ]
   ],

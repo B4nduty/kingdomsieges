@@ -95,7 +95,7 @@ dependencies {
 
     annotationProcessor modImplementation("io.wispforest:owo-lib:${project.owo_version}")
 
-    modImplementation("io.wispforest:accessories-fabric:${project.accessories}")
+    //modImplementation("io.wispforest:accessories-fabric:${project.accessories}")
 
     modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config}") {
         exclude(group: "net.fabricmc.fabric-api")

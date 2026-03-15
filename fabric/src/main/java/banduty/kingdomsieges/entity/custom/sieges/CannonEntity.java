@@ -1,10 +1,10 @@
 package banduty.kingdomsieges.entity.custom.sieges;
 
-import banduty.kingdomsieges.Kingdomsieges;
 import banduty.kingdomsieges.entity.ModEntities;
 import banduty.kingdomsieges.entity.custom.projectiles.CannonProjectile;
 import banduty.kingdomsieges.items.KSItems;
 import banduty.kingdomsieges.sounds.ModSounds;
+import banduty.kingdomsieges.util.sieges.SiegesLoadableItems;
 import banduty.stoneycore.entity.custom.AbstractSiegeEntity;
 import banduty.stoneycore.items.SCItems;
 import banduty.stoneycore.lands.util.Land;
@@ -127,35 +127,45 @@ public class CannonEntity extends AbstractSiegeEntity implements GeoEntity {
         int stage = getLoadStage();
         int cooldown = getCooldown();
 
-        Item expected = switch (stage) {
-            case 0 -> SCItems.BLACK_POWDER;
-            case 1, 3 -> KSItems.RAMROD;
-            case 2 -> Items.STONE;
-            case 4 -> Items.FLINT_AND_STEEL;
-            default -> null;
-        };
+        if (stage >= LOAD_STAGES.length) return InteractionResult.SUCCESS;
+
+        SiegesLoadableItems def = LOAD_STAGES[stage];
+        Item expected = def.item();
 
         if (cooldown > 0) {
             return InteractionResult.SUCCESS;
         }
 
         if (item != expected) {
-            String expectedName = (expected != null) ? expected.getDefaultInstance().getHoverName().getString() : "Unknown";
-            player.displayClientMessage(Component.translatable("entity." + Kingdomsieges.MOD_ID + ".cannon_entity.next_load", expectedName), true);
+            player.displayClientMessage(
+                    Component.translatable(
+                            "siege.loading.next",
+                            expected.getDefaultInstance().getHoverName()
+                    ),
+                    true
+            );
             return InteractionResult.SUCCESS;
         }
 
         if (!player.isCreative()) {
-            if (expected == SCItems.BLACK_POWDER) {
-                if (stack.getCount() < 32) {
-                    player.displayClientMessage(Component.translatable("entity." + Kingdomsieges.MOD_ID + ".cannon_entity.black_powder_needed"), true);
+            if (def.consumesItem()) {
+                if (stack.getCount() < def.amount()) {
+                    player.displayClientMessage(
+                            Component.translatable(
+                                    "siege.loading.need_amount",
+                                    def.amount(),
+                                    expected.getDefaultInstance().getHoverName()
+                            ),
+                            true
+                    );
                     return InteractionResult.FAIL;
                 }
-                stack.shrink(32);
-            } else if (expected == Items.STONE) {
-                stack.shrink(1);
-            } else if (expected == Items.FLINT_AND_STEEL || expected == KSItems.RAMROD) {
-                stack.hurtAndBreak(1, player, (playerT) -> playerT.broadcastBreakEvent(player.getUsedItemHand()));
+                stack.shrink(def.amount());
+            }
+
+            if (def.damagesItem()) {
+                stack.hurtAndBreak(1, player,
+                        p -> p.broadcastBreakEvent(player.getUsedItemHand()));
             }
         }
 
@@ -253,14 +263,28 @@ public class CannonEntity extends AbstractSiegeEntity implements GeoEntity {
         }
     }
 
-
     @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-        controllerRegistrar.add(new AnimationController<>(this, "anim_controller", state -> PlayState.STOP)
-                .triggerableAnim("fire", fire)
-                .triggerableAnim("loaded", loaded)
-                .triggerableAnim("unloaded", unloaded));
+    public void registerControllers(AnimatableManager.ControllerRegistrar registrar) {
 
+        registrar.add(
+                new AnimationController<>(this, "anim_controller", 0, state -> {
+
+                    if (state.isCurrentAnimation(fire)) {
+                        return PlayState.CONTINUE;
+                    }
+
+                    if (getLoadStage() >= 4) {
+                        state.setAnimation(loaded);
+                    } else {
+                        state.setAnimation(unloaded);
+                    }
+
+                    return PlayState.CONTINUE;
+                })
+                        .triggerableAnim("fire", fire)
+                        .triggerableAnim("loaded", loaded)
+                        .triggerableAnim("unloaded", unloaded)
+        );
     }
 
     @Override
@@ -326,4 +350,11 @@ public class CannonEntity extends AbstractSiegeEntity implements GeoEntity {
         return new Vec3(0.0, 0.0, 0.0);
     }
 
+    private static final SiegesLoadableItems[] LOAD_STAGES = new SiegesLoadableItems[]{
+            new SiegesLoadableItems(SCItems.BLACK_POWDER, 32, true, false),
+            new SiegesLoadableItems(KSItems.RAMROD, 1, false, true),
+            new SiegesLoadableItems(Items.STONE, 1, true, false),
+            new SiegesLoadableItems(KSItems.RAMROD, 1, false, true),
+            new SiegesLoadableItems(Items.FLINT_AND_STEEL, 1, false, true)
+    };
 }

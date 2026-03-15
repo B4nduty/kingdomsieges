@@ -1,10 +1,10 @@
 package banduty.kingdomsieges.entity.custom.sieges;
 
-import banduty.kingdomsieges.Kingdomsieges;
 import banduty.kingdomsieges.entity.ModEntities;
 import banduty.kingdomsieges.entity.custom.projectiles.CannonProjectile;
 import banduty.kingdomsieges.items.KSItems;
 import banduty.kingdomsieges.sounds.ModSounds;
+import banduty.kingdomsieges.util.sieges.SiegesLoadableItems;
 import banduty.stoneycore.entity.custom.AbstractSiegeEntity;
 import banduty.stoneycore.items.SCItems;
 import banduty.stoneycore.lands.util.Land;
@@ -130,63 +130,71 @@ public class RibauldequinEntity extends AbstractSiegeEntity implements GeoEntity
         int stage = getLoadStage();
         int cooldown = getCooldown();
 
-        Item expected = getExpectedItem(stage);
+        if (stage >= LOAD_STAGES.length) return InteractionResult.SUCCESS;
+
+        SiegesLoadableItems def = LOAD_STAGES[stage];
+        Item expected = def.item();
 
         if (cooldown > 0) {
             return InteractionResult.SUCCESS;
         }
 
         if (item != expected) {
-            String expectedName = (expected != null) ? expected.getDefaultInstance().getHoverName().getString() : "Unknown";
-            player.displayClientMessage(Component.translatable("entity." + Kingdomsieges.MOD_ID + ".ribauldequin_entity.next_load", expectedName), true);
+            player.displayClientMessage(
+                    Component.translatable(
+                            "siege.loading.next",
+                            expected.getDefaultInstance().getHoverName()
+                    ),
+                    true
+            );
             return InteractionResult.SUCCESS;
         }
 
-        if (!player.isCreative() && !consumeRequiredItems(player, stack, expected)) {
-            return InteractionResult.FAIL;
-        }
+        if (expected == Items.FLINT_AND_STEEL) {
 
-        if (stage == 19) {
-            triggerAnim("anim_controller", "loaded");
-        }
+            if (!player.isCreative()) {
+                stack.hurtAndBreak(1, player,
+                        p -> p.broadcastBreakEvent(player.getUsedItemHand()));
+            }
 
-        if (stage == 20 && item == Items.FLINT_AND_STEEL) {
             fireCannon();
             this.setOwner(player);
+
+            setLoadStage(0); // reset loading cycle
+
+            return InteractionResult.SUCCESS;
+        }
+
+        if (!player.isCreative()) {
+            if (def.consumesItem()) {
+                if (stack.getCount() < def.amount()) {
+                    player.displayClientMessage(
+                            Component.translatable(
+                                    "siege.loading.need_amount",
+                                    def.amount(),
+                                    expected.getDefaultInstance().getHoverName()
+                            ),
+                            true
+                    );
+                    return InteractionResult.FAIL;
+                }
+                stack.shrink(def.amount());
+            }
+
+            if (def.damagesItem()) {
+                stack.hurtAndBreak(1, player,
+                        p -> p.broadcastBreakEvent(player.getUsedItemHand()));
+            }
         }
 
         setLoadStage(stage + 1);
 
+        if (stage + 1 == LOAD_STAGES.length - 1) {
+            triggerAnim("anim_controller", "loaded");
+        }
+
         return InteractionResult.SUCCESS;
     }
-
-    private Item getExpectedItem(int stage) {
-        if (stage == 20) return Items.FLINT_AND_STEEL;
-
-        int cycle = stage % 4;
-        return switch (cycle) {
-            case 0 -> SCItems.BLACK_POWDER.get();
-            case 1, 3 -> KSItems.RAMROD.get();
-            case 2 -> Items.IRON_NUGGET;
-            default -> null;
-        };
-    }
-
-    private boolean consumeRequiredItems(Player player, ItemStack stack, Item expected) {
-        if (expected == SCItems.BLACK_POWDER.get()) {
-            if (stack.getCount() < 2) {
-                player.displayClientMessage(Component.translatable("entity." + Kingdomsieges.MOD_ID + ".ribauldequin_entity.black_powder_needed"), true);
-                return false;
-            }
-            stack.shrink(2);
-        } else if (expected == Items.IRON_NUGGET) {
-            stack.shrink(1);
-        } else if (expected == Items.FLINT_AND_STEEL || expected == KSItems.RAMROD.get()) {
-            stack.hurtAndBreak(1, player, (playerT) -> playerT.broadcastBreakEvent(player.getUsedItemHand()));
-        }
-        return true;
-    }
-
 
     private void fireCannon() {
         triggerAnim("anim_controller", "fire");
@@ -281,12 +289,16 @@ public class RibauldequinEntity extends AbstractSiegeEntity implements GeoEntity
     }
 
     @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-        controllerRegistrar.add(new AnimationController<>(this,"anim_controller", state -> PlayState.STOP)
-                .triggerableAnim("fire", fire)
-                .triggerableAnim("loaded", loaded)
-                .triggerableAnim("unloaded", unloaded));
+    public void registerControllers(AnimatableManager.ControllerRegistrar registrar) {
+        registrar.add(
+                new AnimationController<>(this, "anim_controller", 0, state -> PlayState.CONTINUE)
+                        // firing burst speed depends on burst delay
+                        .triggerableAnim("fire", fire)
+                        .setAnimationSpeed((double) 4 / Math.max(1, nextShotTick + 1))
 
+                        .triggerableAnim("loaded", loaded)
+                        .triggerableAnim("unloaded", unloaded)
+        );
     }
 
     @Override
@@ -321,9 +333,10 @@ public class RibauldequinEntity extends AbstractSiegeEntity implements GeoEntity
             });
         }
 
-        if (getLoadStage() != 19 && getLoadStage() != 20 && getCooldown() <= 0) {
+        if (getLoadStage() < LOAD_STAGES.length - 1 && getCooldown() <= 0) {
             triggerAnim("anim_controller", "unloaded");
         }
+
         setCooldown(Math.max(0, getCooldown() - 1));
 
         if (shotsRemaining > 0) {
@@ -351,4 +364,40 @@ public class RibauldequinEntity extends AbstractSiegeEntity implements GeoEntity
     public Vec3 getPlayerPOV() {
         return new Vec3(0.0, 0.0, 0.0);
     }
+
+    private static final SiegesLoadableItems[] LOAD_STAGES = new SiegesLoadableItems[]{
+
+            // BARREL 1
+            new SiegesLoadableItems(SCItems.BLACK_POWDER.get(), 2, true, false),
+            new SiegesLoadableItems(KSItems.RAMROD.get(), 1, false, true),
+            new SiegesLoadableItems(Items.IRON_NUGGET, 1, true, false),
+            new SiegesLoadableItems(KSItems.RAMROD.get(), 1, false, true),
+
+            // BARREL 2
+            new SiegesLoadableItems(SCItems.BLACK_POWDER.get(), 2, true, false),
+            new SiegesLoadableItems(KSItems.RAMROD.get(), 1, false, true),
+            new SiegesLoadableItems(Items.IRON_NUGGET, 1, true, false),
+            new SiegesLoadableItems(KSItems.RAMROD.get(), 1, false, true),
+
+            // BARREL 3
+            new SiegesLoadableItems(SCItems.BLACK_POWDER.get(), 2, true, false),
+            new SiegesLoadableItems(KSItems.RAMROD.get(), 1, false, true),
+            new SiegesLoadableItems(Items.IRON_NUGGET, 1, true, false),
+            new SiegesLoadableItems(KSItems.RAMROD.get(), 1, false, true),
+
+            // BARREL 4
+            new SiegesLoadableItems(SCItems.BLACK_POWDER.get(), 2, true, false),
+            new SiegesLoadableItems(KSItems.RAMROD.get(), 1, false, true),
+            new SiegesLoadableItems(Items.IRON_NUGGET, 1, true, false),
+            new SiegesLoadableItems(KSItems.RAMROD.get(), 1, false, true),
+
+            // BARREL 5
+            new SiegesLoadableItems(SCItems.BLACK_POWDER.get(), 2, true, false),
+            new SiegesLoadableItems(KSItems.RAMROD.get(), 1, false, true),
+            new SiegesLoadableItems(Items.IRON_NUGGET, 1, true, false),
+            new SiegesLoadableItems(KSItems.RAMROD.get(), 1, false, true),
+
+            // IGNITION
+            new SiegesLoadableItems(Items.FLINT_AND_STEEL, 1, false, true)
+    };
 }

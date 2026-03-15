@@ -5,7 +5,6 @@ import banduty.kingdomsieges.Kingdomsieges;
 import banduty.kingdomsieges.entity.custom.projectiles.CannonProjectile;
 import banduty.kingdomsieges.entity.custom.projectiles.TrebuchetProjectile;
 import banduty.kingdomsieges.entity.custom.sieges.*;
-
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -18,57 +17,57 @@ public interface ModEntities {
             DeferredRegister.create(Registries.ENTITY_TYPE, Kingdomsieges.MOD_ID);
 
     RegistryObject<EntityType<CannonEntity>> CANNON_ENTITY =
-            ENTITY_TYPES.register("cannon_entity", () ->
+            ENTITY_TYPES.register("cannon", () ->
                     EntityType.Builder.of(CannonEntity::new, MobCategory.MISC)
                             .sized(2.0f, 1.5f)
                             .clientTrackingRange(KingdomSiegesForge.CONFIG.common.cannonRange)
                             .updateInterval(1)
-                            .build("cannon_entity")
+                            .build("cannon")
             );
 
     RegistryObject<EntityType<RibauldequinEntity>> RIBAULDEQUIN_ENTITY =
-            ENTITY_TYPES.register("ribauldequin_entity", () ->
+            ENTITY_TYPES.register("ribauldequin", () ->
                     EntityType.Builder.of(RibauldequinEntity::new, MobCategory.MISC)
                             .sized(2.0f, 1.5f)
                             .clientTrackingRange(KingdomSiegesForge.CONFIG.common.ribauldequinRange)
                             .updateInterval(1)
-                            .build("ribauldequin_entity")
+                            .build("ribauldequin")
             );
 
     RegistryObject<EntityType<BatteringRamEntity>> BATTERING_RAM_ENTITY =
-            ENTITY_TYPES.register("battering_ram_entity", () ->
+            ENTITY_TYPES.register("battering_ram", () ->
                     EntityType.Builder.of(BatteringRamEntity::new, MobCategory.MISC)
                             .sized(2.5f, 2.5f)
                             .clientTrackingRange(KingdomSiegesForge.CONFIG.common.batteringRamRange)
                             .updateInterval(1)
-                            .build("battering_ram_entity")
+                            .build("battering_ram")
             );
 
     RegistryObject<EntityType<MangonelEntity>> MANGONEL_ENTITY =
-            ENTITY_TYPES.register("mangonel_entity", () ->
+            ENTITY_TYPES.register("mangonel", () ->
                     EntityType.Builder.of(MangonelEntity::new, MobCategory.MISC)
                             .sized(2.8f, 2.5f)
                             .clientTrackingRange(KingdomSiegesForge.CONFIG.common.mangonelRange)
                             .updateInterval(1)
-                            .build("mangonel_entity")
+                            .build("mangonel")
             );
 
     RegistryObject<EntityType<TrebuchetEntity>> TREBUCHET_ENTITY =
-            ENTITY_TYPES.register("trebuchet_entity", () ->
+            ENTITY_TYPES.register("trebuchet", () ->
                     EntityType.Builder.of(TrebuchetEntity::new, MobCategory.MISC)
                             .sized(4.0f, 3.0f)
                             .clientTrackingRange(KingdomSiegesForge.CONFIG.common.trebuchetRange)
                             .updateInterval(1)
-                            .build("trebuchet_entity")
+                            .build("trebuchet")
             );
 
     RegistryObject<EntityType<MantletEntity>> MANTLET_ENTITY =
-            ENTITY_TYPES.register("mantlet_entity", () ->
+            ENTITY_TYPES.register("mantlet", () ->
                     EntityType.Builder.of(MantletEntity::new, MobCategory.MISC)
                             .sized(2.5f, 2f)
                             .clientTrackingRange(KingdomSiegesForge.CONFIG.common.mantletRange)
                             .updateInterval(1)
-                            .build("mantlet_entity")
+                            .build("mantlet")
             );
 
     RegistryObject<EntityType<CannonProjectile>> CANNON_BALL =

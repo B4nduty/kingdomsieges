@@ -3,6 +3,7 @@ package banduty.kingdomsieges.entity.custom.sieges;
 import banduty.kingdomsieges.entity.ModEntities;
 import banduty.kingdomsieges.entity.custom.projectiles.TrebuchetProjectile;
 import banduty.kingdomsieges.sounds.ModSounds;
+import banduty.kingdomsieges.util.sieges.SiegesLoadableItems;
 import banduty.stoneycore.entity.custom.AbstractSiegeEntity;
 import banduty.stoneycore.lands.util.Land;
 import banduty.stoneycore.lands.util.LandState;
@@ -10,10 +11,12 @@ import banduty.stoneycore.networking.ModMessages;
 import banduty.stoneycore.networking.packet.SiegeYawS2CPacket;
 import banduty.stoneycore.siege.SiegeManager;
 import banduty.stoneycore.util.SCDamageCalculator;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -27,6 +30,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -137,7 +141,7 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
 
             List<ServerPlayer> players = serverLevel.players();
 
-            for(ServerPlayer playerEntity : players) {
+            for (ServerPlayer playerEntity : players) {
                 ModMessages.CHANNEL.send(
                         PacketDistributor.PLAYER.with(() -> playerEntity),
                         new SiegeYawS2CPacket(this.getYRot(), this.getXRot(), this.getWheelRotation())
@@ -148,69 +152,58 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
         }
         ItemStack itemStack = player.getItemInHand(hand);
 
-        if (getAmmoLoaded() == null || getAmmoLoaded().isEmpty()) {
-            if (itemStack.is(Items.STONE)) {
-                itemStack.shrink(1);
-                setAmmoLoaded("stone");
-                setReloadingTime(getBaseReload());
-                triggerAnim("anim_controller", "reload");
-                serverLevel.players().forEach(p -> {
-                    double distance = p.position().distanceTo(this.position());
+        if (getAmmoLoaded().isEmpty()) {
 
-                    if (distance <= 15) {
-                        float t = (float)(distance / 15.0); // normalize 0–15 -> 0–1
-                        float volume = 1.0f - t;            // fades out
+            SiegesLoadableItems match = null;
 
-                        if (volume > 0f) {
-                            p.playNotifySound(ModSounds.ROPE_CHARGE_GN.get(), SoundSource.AMBIENT, volume, random.nextFloat(0.75f, 1.25f));
-                        }
-                    }
-                });
-                return InteractionResult.SUCCESS;
-            } else if (itemStack.is(Items.MAGMA_BLOCK)) {
-                itemStack.shrink(1);
-                setAmmoLoaded("magma");
-                setReloadingTime(getBaseReload());
-                triggerAnim("anim_controller", "reload");
-                serverLevel.players().forEach(p -> {
-                    double distance = p.position().distanceTo(this.position());
-
-                    if (distance <= 15) {
-                        float t = (float)(distance / 15.0); // normalize 0–15 -> 0–1
-                        float volume = 1.0f - t;            // fades out
-
-                        if (volume > 0f) {
-                            p.playNotifySound(ModSounds.ROPE_CHARGE_GN.get(), SoundSource.AMBIENT, volume, random.nextFloat(0.75f, 1.25f));
-                        }
-                    }
-                });
-                return InteractionResult.SUCCESS;
-            }  else if (itemStack.is(Items.ROTTEN_FLESH)) {
-                if (itemStack.getCount() < 9) {
-                    player.displayClientMessage(Component.translatable("entity.kingdomsieges.trebuchet_entity.rotten_flesh"), true);
-                    return InteractionResult.FAIL;
+            for (SiegesLoadableItems s : AMMO_LOADS) {
+                if (itemStack.is(s.item())) {
+                    match = s;
+                    break;
                 }
-                itemStack.shrink(9);
-                setAmmoLoaded("rotten_flesh");
-                setReloadingTime(getBaseReload());
-                triggerAnim("anim_controller", "reload");
-                serverLevel.players().forEach(p -> {
-                    double distance = p.position().distanceTo(this.position());
+            }
 
-                    if (distance <= 15) {
-                        float t = (float)(distance / 15.0); // normalize 0–15 -> 0–1
-                        float volume = 1.0f - t;            // fades out
+            if (match == null) {
 
-                        if (volume > 0f) {
-                            p.playNotifySound(ModSounds.ROPE_CHARGE_GN.get(), SoundSource.AMBIENT, volume, random.nextFloat(0.75f, 1.25f));
-                        }
-                    }
-                });
-                return InteractionResult.SUCCESS;
-            } else {
-                player.displayClientMessage(Component.translatable("entity.kingdomsieges.trebuchet_entity.ammo_needed"), true);
+                Component ammoList =
+                        AMMO_LOADS[0].item().getDefaultInstance().getHoverName()
+                                .copy()
+                                .append(", ")
+                                .append(AMMO_LOADS[1].item().getDefaultInstance().getHoverName())
+                                .append(", ")
+                                .append(AMMO_LOADS[2].item().getDefaultInstance().getHoverName());
+
+                player.displayClientMessage(
+                        Component.translatable("siege.loading.need_one_of", ammoList),
+                        true
+                );
+
                 return InteractionResult.FAIL;
             }
+
+            if (!player.isCreative()) {
+                if (itemStack.getCount() < match.amount()) {
+                    player.displayClientMessage(
+                            Component.translatable(
+                                    "siege.loading.need_amount",
+                                    match.amount(),
+                                    match.item().getDefaultInstance().getHoverName()
+                            ),
+                            true
+                    );
+                    return InteractionResult.FAIL;
+                }
+
+                itemStack.shrink(match.amount());
+            }
+
+            setAmmoLoaded(match.item().toString());
+            setReloadingTime(getBaseReload());
+
+            triggerAnim("anim_controller", "reload");
+            playReloadSound(serverLevel);
+
+            return InteractionResult.SUCCESS;
         }
 
         if (getReloadingTime() == 0) {
@@ -220,7 +213,7 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
                 double distance = p.position().distanceTo(this.position());
 
                 if (distance <= 75) {
-                    float t = (float)(distance / 75.0); // normalize 0–15 -> 0–1
+                    float t = (float) (distance / 75.0); // normalize 0–15 -> 0–1
                     float volume = 1.0f - t;            // fades out
 
                     if (volume > 0f) {
@@ -232,6 +225,26 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
         }
 
         return InteractionResult.SUCCESS;
+    }
+
+    private void playReloadSound(ServerLevel serverLevel) {
+        serverLevel.players().forEach(p -> {
+            double distance = p.position().distanceTo(this.position());
+
+            if (distance <= 15) {
+                float t = (float) (distance / 15.0);
+                float volume = 1.0f - t;
+
+                if (volume > 0f) {
+                    p.playNotifySound(
+                            ModSounds.ROPE_CHARGE_GN.get(),
+                            SoundSource.AMBIENT,
+                            volume,
+                            random.nextFloat(0.75f, 1.25f)
+                    );
+                }
+            }
+        });
     }
 
     private void fireTrebuchet(ServerLevel serverLevel) {
@@ -253,13 +266,16 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
         projectile.setDamageType(SCDamageCalculator.DamageType.BLUDGEONING);
         projectile.setOwner(this);
 
-        if (getAmmoLoaded().equals("stone")) {
+        Item loadedItem = BuiltInRegistries.ITEM
+                .get(ResourceLocation.tryParse(getAmmoLoaded()));
+
+        if (loadedItem == Items.STONE) {
             projectile.setImpactMode(TrebuchetProjectile.ImpactMode.BREAK_BLOCKS);
             projectile.setTextureName("stone");
-        } else if (getAmmoLoaded().equals("magma")) {
+        } else if (loadedItem == Items.MAGMA_BLOCK) {
             projectile.setImpactMode(TrebuchetProjectile.ImpactMode.SPREAD_FIRE);
             projectile.setTextureName("magma");
-        } else if (getAmmoLoaded().equals("rotten_flesh")) {
+        } else if (loadedItem == Items.ROTTEN_FLESH) {
             projectile.setImpactMode(TrebuchetProjectile.ImpactMode.SPREAD_EFFECT);
             projectile.setStatusEffectInstance(new MobEffectInstance(MobEffects.POISON, 100, 0, true, true, true));
             projectile.setCloudDuration(600);
@@ -273,7 +289,7 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-        controllerRegistrar.add(new AnimationController<>(this,"anim_controller", state -> PlayState.STOP)
+        controllerRegistrar.add(new AnimationController<>(this, "anim_controller", state -> PlayState.STOP)
                 .triggerableAnim("shoot", shoot)
                 .triggerableAnim("reload", reload).setAnimationSpeed(getReloadingTime() > 0 ? 200d / getReloadingTime() : 1.0)
                 .triggerableAnim("loaded", loaded)
@@ -319,4 +335,10 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
     public Vec3 getPlayerPOV() {
         return new Vec3(0.0, 0.0f, 0.0);
     }
+
+    private static final SiegesLoadableItems[] AMMO_LOADS = new SiegesLoadableItems[]{
+            new SiegesLoadableItems(Items.STONE, 1, true, false),
+            new SiegesLoadableItems(Items.MAGMA_BLOCK, 1, true, false),
+            new SiegesLoadableItems(Items.ROTTEN_FLESH, 9, true, false)
+    };
 }

@@ -17,7 +17,7 @@ import net.minecraft.world.entity.MobCategory;
 
 public interface ModEntities {
     EntityType<CannonEntity> CANNON_ENTITY =
-            registerEntity("cannon_entity", 
+            registerEntity("cannon",
                     FabricEntityTypeBuilder.create(MobCategory.MISC, CannonEntity::new)
                             .dimensions(EntityDimensions.fixed(2.0f, 1.5f))
                             .trackRangeBlocks(KingdomSiegesFabric.getConfig().clientOptions.cannonRange())
@@ -26,7 +26,7 @@ public interface ModEntities {
             );
 
     EntityType<RibauldequinEntity> RIBAULDEQUIN_ENTITY =
-            registerEntity("ribauldequin_entity", 
+            registerEntity("ribauldequin",
                     FabricEntityTypeBuilder.create(MobCategory.MISC, RibauldequinEntity::new)
                             .dimensions(EntityDimensions.fixed(2.0f, 1.5f))
                             .trackRangeBlocks(KingdomSiegesFabric.getConfig().clientOptions.ribauldequinRange())
@@ -35,7 +35,7 @@ public interface ModEntities {
             );
 
     EntityType<BatteringRamEntity> BATTERING_RAM_ENTITY =
-            registerEntity("battering_ram_entity", 
+            registerEntity("battering_ram",
                     FabricEntityTypeBuilder.create(MobCategory.MISC, BatteringRamEntity::new)
                             .dimensions(EntityDimensions.fixed(2.5f, 2.5f))
                             .trackRangeBlocks(KingdomSiegesFabric.getConfig().clientOptions.batteringRamRange())
@@ -44,7 +44,7 @@ public interface ModEntities {
             );
 
     EntityType<MangonelEntity> MANGONEL_ENTITY =
-            registerEntity("mangonel_entity", 
+            registerEntity("mangonel",
                     FabricEntityTypeBuilder.create(MobCategory.MISC, MangonelEntity::new)
                             .dimensions(EntityDimensions.fixed(2.8f, 2.5f))
                             .trackRangeBlocks(KingdomSiegesFabric.getConfig().clientOptions.mangonelRange())
@@ -53,7 +53,7 @@ public interface ModEntities {
             );
 
     EntityType<TrebuchetEntity> TREBUCHET_ENTITY =
-            registerEntity("trebuchet_entity", 
+            registerEntity("trebuchet",
                     FabricEntityTypeBuilder.create(MobCategory.MISC, TrebuchetEntity::new)
                             .dimensions(EntityDimensions.fixed(4.0f, 3.0f))
                             .trackRangeBlocks(KingdomSiegesFabric.getConfig().clientOptions.trebuchetRange())
@@ -62,7 +62,7 @@ public interface ModEntities {
             );
 
     EntityType<MantletEntity> MANTLET_ENTITY =
-            registerEntity("mantlet_entity", 
+            registerEntity("mantlet",
                     FabricEntityTypeBuilder.create(MobCategory.MISC, MantletEntity::new)
                             .dimensions(EntityDimensions.fixed(2.5f, 2f))
                             .trackRangeBlocks(KingdomSiegesFabric.getConfig().clientOptions.mantletRange())
@@ -71,7 +71,7 @@ public interface ModEntities {
             );
 
     EntityType<CannonProjectile> CANNON_BALL =
-            registerEntity("cannon_ball", 
+            registerEntity("cannon_ball",
                     FabricEntityTypeBuilder.<CannonProjectile>create(MobCategory.MISC, CannonProjectile::new)
                             .dimensions(EntityDimensions.fixed(0.25f, 0.25f))
                             .trackRangeBlocks(KingdomSiegesFabric.getConfig().clientOptions.cannonBallRange())
@@ -80,7 +80,7 @@ public interface ModEntities {
             );
 
     EntityType<TrebuchetProjectile> TREBUCHET_PROJECTILE =
-            registerEntity("trebuchet_projectile", 
+            registerEntity("trebuchet_projectile",
                     FabricEntityTypeBuilder.<TrebuchetProjectile>create(MobCategory.MISC, TrebuchetProjectile::new)
                             .dimensions(EntityDimensions.fixed(0.25f, 0.25f))
                             .trackRangeBlocks(KingdomSiegesFabric.getConfig().clientOptions.trebuchetProjectileRange())
