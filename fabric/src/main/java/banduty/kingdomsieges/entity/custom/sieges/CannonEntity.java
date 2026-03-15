@@ -351,7 +351,7 @@ public class CannonEntity extends AbstractSiegeEntity implements GeoEntity {
     }
 
     private static final SiegesLoadableItems[] LOAD_STAGES = new SiegesLoadableItems[]{
-            new SiegesLoadableItems(SCItems.BLACK_POWDER, 32, true, false),
+            new SiegesLoadableItems(SCItems.BLACK_POWDER, 3, true, false),
             new SiegesLoadableItems(KSItems.RAMROD, 1, false, true),
             new SiegesLoadableItems(Items.STONE, 1, true, false),
             new SiegesLoadableItems(KSItems.RAMROD, 1, false, true),
