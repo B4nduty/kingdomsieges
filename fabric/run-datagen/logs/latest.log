@@ -1,5 +1,5 @@
-[18:13:35] [main/INFO] (FabricLoader/GameProvider) Loading Minecraft 1.20.1 with Fabric Loader 0.16.10
-[18:13:35] [main/INFO] (FabricLoader) Loading 54 mods:
+[07:00:40] [main/INFO] (FabricLoader/GameProvider) Loading Minecraft 1.20.1 with Fabric Loader 0.16.10
+[07:00:40] [main/INFO] (FabricLoader) Loading 54 mods:
 	- cloth-basic-math 0.6.1
 	- cloth-config 11.1.136
 	- fabric-api 0.92.7+1.20.1
@@ -45,7 +45,7 @@
 	- fabric-transitive-access-wideners-v1 4.3.2+1802ada577
 	- fabricloader 0.16.10
 	- geckolib 4.7.1.2
-	- java 17
+	- java 21
 	- jei 15.20.0.118
 	- kingdomsieges 0.8.0.5
 	- minecraft 1.20.1
@@ -53,40 +53,40 @@
 	- mod_id 1.1.0
 	- owo 0.11.2+1.20
 	- reach-entity-attributes 2.4.0
-	- stoneycore 0.7.1.91
-[18:13:36] [main/INFO] (FabricLoader/Mixin) SpongePowered MIXIN Subsystem Version=0.8.7 Source=file:/C:/Users/Administrator/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.15.4+mixin.0.8.7/6a12aacc794f1078458433116e9ed42c1cc98096/sponge-mixin-0.15.4+mixin.0.8.7.jar Service=Knot/Fabric Env=SERVER
-[18:13:36] [main/INFO] (FabricLoader/Mixin) Loaded Fabric development mappings for mixin remapper!
-[18:13:36] [main/INFO] (FabricLoader/Mixin) Compatibility level set to JAVA_16
-[18:13:36] [main/INFO] (FabricLoader/Mixin) Compatibility level set to JAVA_17
-[18:13:36] [main/WARN] (FabricLoader/Mixin) Reference map 'kingdomsieges.refmap.json' for kingdomsieges.mixins.json could not be read. If this is a development environment you can ignore this message
-[18:13:36] [main/WARN] (FabricLoader/Mixin) Reference map 'kingdomsieges.refmap.json' for kingdomsieges.fabric.mixins.json could not be read. If this is a development environment you can ignore this message
-[18:13:37] [main/WARN] (FabricLoader/Mixin) Error loading class: fr/catcore/server/translations/api/resource/language/SystemDelegatedLanguage (java.lang.ClassNotFoundException: fr/catcore/server/translations/api/resource/language/SystemDelegatedLanguage)
-[18:13:37] [main/INFO] (FabricLoader/MixinExtras|Service) Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.4.1).
-[18:13:37] [main/WARN] (FabricLoader/Mixin) Error loading class: org/quiltmc/loader/impl/game/minecraft/Hooks (java.lang.ClassNotFoundException: org/quiltmc/loader/impl/game/minecraft/Hooks)
-[18:13:48] [main/INFO] (Kingdoms & Sieges) Hello to Kingdoms & Sieges
-[18:13:48] [main/INFO] (Kingdoms & Sieges) Registering Entities for kingdomsieges
-[18:13:48] [main/INFO] (Kingdoms & Sieges) Registering Mod Items for kingdomsieges
-[18:13:48] [main/INFO] (Kingdoms & Sieges) Registering Lands for kingdomsieges
-[18:13:48] [main/INFO] (Kingdoms & Sieges) Registering Entities Attributes for kingdomsieges
-[18:13:48] [main/INFO] (Kingdoms & Sieges) Registering Sounds for kingdomsieges
-[18:13:48] [main/INFO] (Kingdoms & Sieges) Registering Structures for kingdomsieges
-[18:13:48] [main/INFO] (owo) Blodhgarm: Did you know it took four switcheroos to implement the Matrices in the correct folder
-[18:13:48] [main/INFO] (StoneyCore) Registered attributes for stoneycore
-[18:13:48] [main/INFO] (StoneyCore) Registering Sounds for stoneycore
-[18:13:48] [main/INFO] (StoneyCore) Registering ModRecipes for stoneycore
-[18:13:48] [main/INFO] (StoneyCore) Registering Mod Items for stoneycore
-[18:13:48] [main/INFO] (StoneyCore) Registering Entities for stoneycore
-[18:13:48] [main/INFO] (StoneyCore) Registering Menu for stoneycore
-[18:13:48] [main/INFO] (StoneyCore) Registering Mod Blocks for stoneycore
-[18:13:48] [main/INFO] (StoneyCore) Registering Mod Block Entities for stoneycore
-[18:13:48] [main/INFO] (StoneyCore) Registering Particles for stoneycore
-[18:13:48] [main/INFO] (StoneyCore) Hello Fabric world!
-[18:13:48] [main/INFO] (StoneyCore) Hello to stoneycore
-[18:13:48] [main/INFO] (owo) Services frozen by 'net.minecraft.server.Main'
-[18:13:48] [main/INFO] (FabricDataGenHelper) Running data generator for kingdomsieges
-[18:13:48] [main/INFO] (Minecraft) Starting provider: Kingdoms & Sieges/Model Definitions
-[18:13:49] [main/INFO] (Minecraft) Kingdoms & Sieges/Model Definitions finished after 76 ms
-[18:13:49] [main/INFO] (Minecraft) Starting provider: Kingdoms & Sieges/Recipes
-[18:13:49] [main/INFO] (Minecraft) Kingdoms & Sieges/Recipes finished after 34 ms
-[18:13:49] [main/INFO] (Minecraft) All providers took: 112 ms
-[18:13:49] [main/INFO] (Minecraft) Caching: total files: 17, old count: 17, new count: 18, removed stale: 0, written: 2
+	- stoneycore 0.7.1.93
+[07:00:41] [main/INFO] (FabricLoader/Mixin) SpongePowered MIXIN Subsystem Version=0.8.7 Source=file:/C:/Users/Administrator/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.15.4+mixin.0.8.7/6a12aacc794f1078458433116e9ed42c1cc98096/sponge-mixin-0.15.4+mixin.0.8.7.jar Service=Knot/Fabric Env=SERVER
+[07:00:41] [main/INFO] (FabricLoader/Mixin) Loaded Fabric development mappings for mixin remapper!
+[07:00:41] [main/INFO] (FabricLoader/Mixin) Compatibility level set to JAVA_16
+[07:00:41] [main/INFO] (FabricLoader/Mixin) Compatibility level set to JAVA_17
+[07:00:42] [main/WARN] (FabricLoader/Mixin) Reference map 'kingdomsieges.refmap.json' for kingdomsieges.mixins.json could not be read. If this is a development environment you can ignore this message
+[07:00:42] [main/WARN] (FabricLoader/Mixin) Reference map 'kingdomsieges.refmap.json' for kingdomsieges.fabric.mixins.json could not be read. If this is a development environment you can ignore this message
+[07:00:42] [main/WARN] (FabricLoader/Mixin) Error loading class: fr/catcore/server/translations/api/resource/language/SystemDelegatedLanguage (java.lang.ClassNotFoundException: fr/catcore/server/translations/api/resource/language/SystemDelegatedLanguage)
+[07:00:44] [main/INFO] (FabricLoader/MixinExtras|Service) Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.4.1).
+[07:00:44] [main/WARN] (FabricLoader/Mixin) Error loading class: org/quiltmc/loader/impl/game/minecraft/Hooks (java.lang.ClassNotFoundException: org/quiltmc/loader/impl/game/minecraft/Hooks)
+[07:00:59] [main/INFO] (owo) There is a 1% chance that instead of Frog, you get Froge!
+[07:00:59] [main/INFO] (Kingdoms & Sieges) Hello to Kingdoms & Sieges
+[07:00:59] [main/INFO] (Kingdoms & Sieges) Registering Entities for kingdomsieges
+[07:00:59] [main/INFO] (Kingdoms & Sieges) Registering Mod Items for kingdomsieges
+[07:00:59] [main/INFO] (Kingdoms & Sieges) Registering Lands for kingdomsieges
+[07:00:59] [main/INFO] (Kingdoms & Sieges) Registering Entities Attributes for kingdomsieges
+[07:00:59] [main/INFO] (Kingdoms & Sieges) Registering Sounds for kingdomsieges
+[07:00:59] [main/INFO] (Kingdoms & Sieges) Registering Structures for kingdomsieges
+[07:00:59] [main/INFO] (StoneyCore) Registered attributes for stoneycore
+[07:00:59] [main/INFO] (StoneyCore) Registering Sounds for stoneycore
+[07:00:59] [main/INFO] (StoneyCore) Registering ModRecipes for stoneycore
+[07:00:59] [main/INFO] (StoneyCore) Registering Mod Items for stoneycore
+[07:00:59] [main/INFO] (StoneyCore) Registering Entities for stoneycore
+[07:00:59] [main/INFO] (StoneyCore) Registering Menu for stoneycore
+[07:00:59] [main/INFO] (StoneyCore) Registering Mod Blocks for stoneycore
+[07:00:59] [main/INFO] (StoneyCore) Registering Mod Block Entities for stoneycore
+[07:00:59] [main/INFO] (StoneyCore) Registering Particles for stoneycore
+[07:00:59] [main/INFO] (StoneyCore) Hello Fabric world!
+[07:00:59] [main/INFO] (StoneyCore) Hello to stoneycore
+[07:00:59] [main/INFO] (owo) Services frozen by 'net.minecraft.server.Main'
+[07:00:59] [main/INFO] (FabricDataGenHelper) Running data generator for kingdomsieges
+[07:01:00] [main/INFO] (Minecraft) Starting provider: Kingdoms & Sieges/Model Definitions
+[07:01:00] [main/INFO] (Minecraft) Kingdoms & Sieges/Model Definitions finished after 132 ms
+[07:01:00] [main/INFO] (Minecraft) Starting provider: Kingdoms & Sieges/Recipes
+[07:01:00] [main/INFO] (Minecraft) Kingdoms & Sieges/Recipes finished after 94 ms
+[07:01:00] [main/INFO] (Minecraft) All providers took: 228 ms
+[07:01:00] [main/INFO] (Minecraft) Caching: total files: 17, old count: 17, new count: 18, removed stale: 0, written: 2

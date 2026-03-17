@@ -117,9 +117,6 @@ dependencies {
 
     modImplementation "software.bernie.geckolib:geckolib-forge-1.20.1:${project.geckolib}"
 
-    //modImplementation "io.wispforest:accessories-neoforge:${accessories}"
-    //compileOnly "io.wispforest:accessories-neoforge:${accessories}"
-
     modApi "me.shedaniel.cloth:cloth-config-forge:${cloth_config}"
 }
 

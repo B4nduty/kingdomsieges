@@ -2,6 +2,7 @@ package banduty.kingdomsieges.entity.custom.projectiles;
 
 import banduty.stoneycore.entity.custom.AbstractSiegeEntity;
 import banduty.stoneycore.entity.custom.AbstractSiegeProjectile;
+import banduty.stoneycore.particle.ModParticles;
 import banduty.stoneycore.util.BlockDamageTracker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -43,6 +44,13 @@ public class CannonProjectile extends AbstractSiegeProjectile {
 
         if (this.level() instanceof ServerLevel serverLevel) {
             BlockDamageTracker.clean(serverLevel);
+            serverLevel.sendParticles(
+                    ModParticles.MUZZLES_SMOKE_PARTICLE.get(),
+                    getX(), getY(), getZ(),
+                    5,
+                    0, 0, 0,
+                    0.0001
+            );
         }
     }
 
