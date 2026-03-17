@@ -41,7 +41,7 @@ public class KingdomSiegesForge {
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
-            ModLands.init();
+            ModLands.registerLands();
         });
     }
 }
