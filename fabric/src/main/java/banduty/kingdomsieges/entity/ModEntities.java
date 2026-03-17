@@ -5,7 +5,6 @@ import banduty.kingdomsieges.Kingdomsieges;
 import banduty.kingdomsieges.entity.custom.projectiles.CannonProjectile;
 import banduty.kingdomsieges.entity.custom.projectiles.TrebuchetProjectile;
 import banduty.kingdomsieges.entity.custom.sieges.*;
-import banduty.stoneycore.StoneyCore;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -89,7 +88,7 @@ public interface ModEntities {
             );
 
     private static <T extends Entity> EntityType<T> registerEntity(String name, EntityType<T> entityType) {
-        return Registry.register(BuiltInRegistries.ENTITY_TYPE, new ResourceLocation(StoneyCore.MOD_ID, name), entityType);
+        return Registry.register(BuiltInRegistries.ENTITY_TYPE, new ResourceLocation(Kingdomsieges.MOD_ID, name), entityType);
     }
 
     static void registerEntities() {
