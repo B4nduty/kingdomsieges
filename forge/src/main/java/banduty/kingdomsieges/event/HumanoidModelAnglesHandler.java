@@ -7,11 +7,12 @@ import banduty.stoneycore.event.custom.HumanoidModelSetupAnimEvents;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraft.world.phys.Vec3;
 
-@Mod.EventBusSubscriber(modid = Kingdomsieges.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber(modid = Kingdomsieges.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class HumanoidModelAnglesHandler {
 
     @SubscribeEvent
@@ -93,8 +94,8 @@ public class HumanoidModelAnglesHandler {
     }
 
     private static void setupHead(HumanoidModel<?> model, float headYaw, float headPitch) {
-        float xRot = headPitch * ((float)Math.PI / 180F);
-        float yRot = headYaw * ((float)Math.PI / 180F);
+        float xRot = headPitch * ((float) Math.PI / 180F);
+        float yRot = headYaw * ((float) Math.PI / 180F);
         model.head.xRot = xRot;
         model.head.yRot = yRot;
         model.hat.xRot = xRot;
