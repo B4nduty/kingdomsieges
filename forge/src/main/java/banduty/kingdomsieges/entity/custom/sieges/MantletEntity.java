@@ -2,26 +2,17 @@ package banduty.kingdomsieges.entity.custom.sieges;
 
 import banduty.kingdomsieges.sounds.ModSounds;
 import banduty.stoneycore.entity.custom.AbstractSiegeEntity;
-import banduty.stoneycore.lands.util.Land;
-import banduty.stoneycore.lands.util.LandState;
-import banduty.stoneycore.siege.SiegeManager;
-import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
+import banduty.stoneycore.entity.custom.siegeentity.SiegeProperties;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.horse.Horse;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -33,20 +24,20 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 public class MantletEntity extends AbstractSiegeEntity implements GeoEntity {
-    private int moveTick;
-    private final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
-    private final RawAnimation setup = RawAnimation.begin().then("set_up", Animation.LoopType.HOLD_ON_LAST_FRAME);
-    private final RawAnimation pickup = RawAnimation.begin().then("pick_up", Animation.LoopType.HOLD_ON_LAST_FRAME);
-    protected static final EntityDataAccessor<Boolean> PICKED;
 
-    static {
-        PICKED = SynchedEntityData.defineId(MantletEntity.class, EntityDataSerializers.BOOLEAN);
-    }
+    private static final SiegeProperties PROPERTIES = SiegeProperties.builder("mantlet")
+            .health(300.0)
+            .speed(0.01)
+            .knockbackResist(265.0)
+            .moveSound(ModSounds.SIEGE_ENGINE_MOVE.get())
+            .moveSoundDelay(150)
+            .moveSoundRange(30.0)
+            .build();
+
+    private final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
+    private final RawAnimation setupAnim = RawAnimation.begin().then("set_up", Animation.LoopType.HOLD_ON_LAST_FRAME);
+    private final RawAnimation pickupAnim = RawAnimation.begin().then("pick_up", Animation.LoopType.HOLD_ON_LAST_FRAME);
 
     public MantletEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
@@ -60,153 +51,58 @@ public class MantletEntity extends AbstractSiegeEntity implements GeoEntity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(PICKED, false);
-    }
-
-    public void setPicked(boolean picked) {
-        this.entityData.set(PICKED, picked);
-    }
-
-    public boolean getPicked() {
-            return this.entityData.get(PICKED);
-    }
+    public SiegeProperties getProperties() { return PROPERTIES; }
 
     @Override
-    public boolean canAddPassenger(Entity entity) {
-        return this.getPassengers().isEmpty() && (entity instanceof Player || entity instanceof Horse);
-    }
+    public InteractionResult handleSiegeInteraction(Player player, InteractionHand hand, ServerLevel serverLevel) {
+        if (getFirstPassenger() != null) return InteractionResult.FAIL;
 
-    @Override
-    public InteractionResult interact(Player player, InteractionHand hand) {
-        if (!(this.level() instanceof ServerLevel serverLevel) || hand != InteractionHand.MAIN_HAND) {
-            return super.interact(player, hand);
-        }
-
-        UUID playerId = player.getUUID();
-
-        // Siege check
-        Optional<SiegeManager.Siege> siegeOpt = SiegeManager.getPlayerSiege(serverLevel, playerId);
-        if (siegeOpt.map(siege -> siege.isDisabled(playerId)).orElse(false)) {
-            return InteractionResult.FAIL;
-        }
-
-        // Land ownership check
-        LandState stateManager = LandState.get(serverLevel);
-        Optional<Land> maybeLand = stateManager.getLandAt(this.getOnPos());
-        boolean isOwnerOrAlly = maybeLand
-                .map(land -> land.getOwnerUUID().equals(playerId) || land.isAlly(playerId) || player.isCreative())
-                .orElse(true);
-        if (!isOwnerOrAlly) {
-            return InteractionResult.FAIL;
-        }
-
-        ItemStack heldItem = player.getItemInHand(hand);
-
-        if (this.getFirstPassenger() instanceof Mob mob) {
-            if (heldItem.is(Items.SHEARS)) {
-                mob.stopRiding();
-
-                double[] offset = calculateHorseDismountOffset(mob);
-                double dX = this.getX() + offset[0];
-                double dY = this.getY() + 0.5;
-                double dZ = this.getZ() + offset[1];
-                mob.setPos(dX, dY, dZ);
-
-                ItemEntity leadEntity = new ItemEntity(this.level(), dX, dY, dZ, new ItemStack(Items.LEAD));
-                this.level().addFreshEntity(leadEntity);
-
-                player.playNotifySound(SoundEvents.SHEEP_SHEAR, SoundSource.NEUTRAL, 1.0f, 1.0f);
-                return InteractionResult.SUCCESS;
-            }
-            player.startRiding(mob);
-            return InteractionResult.SUCCESS;
-        }
-
-        if (this.getPassengers().isEmpty()) {
-            List<Entity> nearby = this.level().getEntities(player, this.getBoundingBox().inflate(4.0),
-                    entity -> entity instanceof Mob);
-
-            for (Entity entity : nearby) {
-                if (canAddPassenger(entity) && entity instanceof Mob mob && mob.getLeashHolder() == player &&
-                        !(mob instanceof TamableAnimal tameableEntity && !tameableEntity.isTame()) &&
-                        (!(entity instanceof Saddleable saddleable) || saddleable.isSaddled())) {
-                    mob.dropLeash(true, false);
-                    mob.stopRiding();
-                    mob.startRiding(this);
-                    this.stopTriggeredAnimation("anim_controller", "set_up");
-                    this.triggerAnim("anim_controller", "pick_up");
-                    return InteractionResult.SUCCESS;
-                }
-            }
-        }
-
-        if (this.getFirstPassenger() != null) return InteractionResult.FAIL;
-
-        if (this.canAddPassenger(player) && !player.isShiftKeyDown()) {
+        if (canAddPassenger(player) && !player.isShiftKeyDown()) {
             player.startRiding(this);
-            this.setOwner(player);
-            this.stopTriggeredAnimation("anim_controller", "set_up");
-            this.triggerAnim("anim_controller", "pick_up");
+            setOwner(player);
+            stopAnimation("set_up");
+            triggerAnimation("pick_up");
             return InteractionResult.SUCCESS;
         }
 
-        return InteractionResult.SUCCESS;
+        return InteractionResult.PASS;
     }
 
     @Override
-    public void tick() {
-        super.tick();
-
-        this.setPicked(this.getFirstPassenger() != null);
-
-        if (this.level() instanceof ServerLevel serverLevel) {
-            if (!this.getPicked()) {
-                this.stopTriggeredAnimation("anim_controller", "pick_up");
-                this.triggerAnim("anim_controller", "set_up");
-            }
-
-            boolean isMoving = this.getDeltaMovement().x != 0 || this.getDeltaMovement().y != 0;
-
-            if (isMoving && isAlive()) {
-                if (this.moveTick >= 150 || this.moveTick == 0) {
-                    serverLevel.players().forEach(p -> {
-                        if (p.position().distanceTo(this.position()) <= 30) {
-                            p.playNotifySound(ModSounds.SIEGE_ENGINE_MOVE.get(), SoundSource.AMBIENT, (float) (1.0f - p.position().distanceTo(this.position()) / 30), 1.0f);
-                        }
-                    });
-                    if (this.moveTick != 0) this.moveTick = 0;
-                }
-                moveTick++;
-            } else if (this.moveTick != 0 || !isAlive()) {
-                this.moveTick = 0;
-                serverLevel.players().forEach(p -> {
-                    p.connection.send(new ClientboundStopSoundPacket(ModSounds.SIEGE_ENGINE_MOVE.get().getLocation(), SoundSource.AMBIENT));
-                });
-            }
+    public void onSiegeTick(ServerLevel serverLevel) {
+        if (!isPicked()) {
+            stopAnimation("pick_up");
+            triggerAnimation("set_up");
         }
     }
 
     @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-        controllerRegistrar.add(new AnimationController<>(this,"anim_controller", state -> PlayState.STOP)
-                .triggerableAnim("set_up", setup)
-                .triggerableAnim("pick_up", pickup));
+    public void registerControllers(AnimatableManager.ControllerRegistrar registrar) {
+        registrar.add(new AnimationController<>(this, "anim_controller", state -> PlayState.STOP)
+                .triggerableAnim("set_up", setupAnim)
+                .triggerableAnim("pick_up", pickupAnim));
+    }
 
+    @Override
+    public void triggerAnimation(String name) {
+        if ("set_up".equals(name)) triggerAnim("anim_controller", "set_up");
+        if ("pick_up".equals(name)) triggerAnim("anim_controller", "pick_up");
+    }
+
+    @Override
+    public void stopAnimation(String name) {
+        if ("set_up".equals(name)) stopTriggeredAnimation("anim_controller", "set_up");
+        if ("pick_up".equals(name)) stopTriggeredAnimation("anim_controller", "pick_up");
     }
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.animatableInstanceCache;
+        return animatableInstanceCache;
     }
 
     @Override
     public Vec3 getPassengerOffset(Entity entity) {
-        if (entity instanceof Horse) {
-            return new Vec3(0.0, 0.0, -2.0); // Left, Up, Back
-        }
-        return new Vec3(0.0, 0.0, 2.5);
+        return entity instanceof Horse ? new Vec3(0.0, 0.0, -2.0) : new Vec3(0.0, 0.0, 2.5);
     }
 
     @Override

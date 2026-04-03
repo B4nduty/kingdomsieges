@@ -4,21 +4,14 @@ import banduty.kingdomsieges.entity.ModEntities;
 import banduty.kingdomsieges.entity.custom.projectiles.CannonProjectile;
 import banduty.kingdomsieges.items.KSItems;
 import banduty.kingdomsieges.sounds.ModSounds;
-import banduty.kingdomsieges.util.sieges.SiegesLoadableItems;
 import banduty.stoneycore.entity.custom.AbstractSiegeEntity;
+import banduty.stoneycore.entity.custom.siegeentity.LoadingStage;
+import banduty.stoneycore.entity.custom.siegeentity.SiegeProperties;
 import banduty.stoneycore.items.SCItems;
-import banduty.stoneycore.lands.util.Land;
-import banduty.stoneycore.lands.util.LandState;
-import banduty.stoneycore.particle.ModParticles;
-import banduty.stoneycore.siege.SiegeManager;
 import banduty.stoneycore.util.SCDamageCalculator;
-import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -28,7 +21,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -42,19 +34,29 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 public class CannonEntity extends AbstractSiegeEntity implements GeoEntity {
-    private int moveTick;
-    private final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
-    private final RawAnimation fire = RawAnimation.begin().then("fire", Animation.LoopType.PLAY_ONCE);
-    private final RawAnimation loaded = RawAnimation.begin().then("loaded", Animation.LoopType.PLAY_ONCE);
-    private final RawAnimation unloaded = RawAnimation.begin().then("unloaded", Animation.LoopType.PLAY_ONCE);
 
-    public int loadStage;
+    private static final SiegeProperties PROPERTIES = SiegeProperties.builder("cannon")
+            .health(50.0)
+            .speed(0.05)
+            .knockbackResist(265.0)
+            .moveSound(ModSounds.SIEGE_ENGINE_MOVE)
+            .reloadSound(ModSounds.ROPE_CHARGE_GN)
+            .shootSound(ModSounds.CANNON_CLOSE)
+            .build();
+
+    private static final LoadingStage[] LOAD_STAGES = {
+            LoadingStage.of(SCItems.BLACK_POWDER, 10),
+            LoadingStage.ofDamaging(KSItems.RAMROD),
+            LoadingStage.of(Items.STONE),
+            LoadingStage.ofDamaging(KSItems.RAMROD),
+            LoadingStage.ofDamaging(Items.FLINT_AND_STEEL)
+    };
+
+    private final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
+    private final RawAnimation fireAnim = RawAnimation.begin().then("fire", Animation.LoopType.PLAY_ONCE);
+    private final RawAnimation loadedAnim = RawAnimation.begin().then("loaded", Animation.LoopType.PLAY_ONCE);
+    private final RawAnimation unloadedAnim = RawAnimation.begin().then("unloaded", Animation.LoopType.PLAY_ONCE);
 
     public CannonEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
@@ -68,293 +70,160 @@ public class CannonEntity extends AbstractSiegeEntity implements GeoEntity {
     }
 
     @Override
-    public void load(CompoundTag nbt) {
-        this.loadStage = nbt.getInt("loadStage");
-        super.load(nbt);
-    }
+    public SiegeProperties getProperties() { return PROPERTIES; }
 
     @Override
-    public boolean canAddPassenger(Entity entity) {
-        return this.getPassengers().isEmpty() && (entity instanceof Player || entity instanceof Horse);
-    }
+    public InteractionResult handleSiegeInteraction(Player player, InteractionHand hand, ServerLevel serverLevel) {
+        if (getFirstPassenger() != null) return InteractionResult.FAIL;
 
-    @Override
-    public CompoundTag saveWithoutId(CompoundTag nbt) {
-        nbt.putInt("loadStage", loadStage);
-        return super.saveWithoutId(nbt);
-    }
-
-    public int getLoadStage() {
-        return loadStage;
-    }
-
-    public void setLoadStage(int loadStage) {
-        this.loadStage = loadStage;
-    }
-
-    @Override
-    public InteractionResult interact(Player player, InteractionHand hand) {
-        if (!(this.level() instanceof ServerLevel serverLevel) || hand != InteractionHand.MAIN_HAND) {
-            return super.interact(player, hand);
-        }
-
-        super.interact(player, hand);
-
-        UUID playerId = player.getUUID();
-
-        // Siege check
-        Optional<SiegeManager.Siege> siegeOpt = SiegeManager.getPlayerSiege(serverLevel, playerId);
-        if (siegeOpt.map(siege -> siege.isDisabled(playerId)).orElse(false)) {
-            return InteractionResult.FAIL;
-        }
-
-        // Land ownership check
-        LandState stateManager = LandState.get(serverLevel);
-        Optional<Land> maybeLand = stateManager.getLandAt(this.getOnPos());
-        boolean isOwnerOrAlly = maybeLand
-                .map(land -> land.getOwnerUUID().equals(playerId) || land.isAlly(playerId) || player.isCreative())
-                .orElse(true);
-        if (!isOwnerOrAlly) {
-            return InteractionResult.FAIL;
-        }
-
-        // Passenger check
-        if (this.getFirstPassenger() != null) return InteractionResult.FAIL;
-
-        // Interaction logic
         ItemStack stack = player.getItemInHand(hand);
-        Item item = stack.getItem();
         int stage = getLoadStage();
-        int cooldown = getCooldown();
 
         if (stage >= LOAD_STAGES.length) return InteractionResult.SUCCESS;
+        if (getCooldown() > 0) return InteractionResult.SUCCESS;
 
-        SiegesLoadableItems def = LOAD_STAGES[stage];
-        Item expected = def.item();
+        ItemStack itemStack = player.getItemInHand(hand);
 
-        if (cooldown > 0) {
+        if (itemStack.isEmpty() && canAddPassenger(player) && !player.isShiftKeyDown()) {
+            player.startRiding(this);
+            setOwner(player);
             return InteractionResult.SUCCESS;
         }
 
-        if (item != expected) {
+        LoadingStage required = LOAD_STAGES[stage];
+
+        if (!required.matches(stack.getItem())) {
             player.displayClientMessage(
-                    Component.translatable(
-                            "siege.loading.next",
-                            expected.getDefaultInstance().getHoverName()
-                    ),
-                    true
-            );
+                    Component.translatable("siege.loading.next", required.item().getDefaultInstance().getHoverName()),
+                    true);
+            return InteractionResult.SUCCESS;
+        }
+
+        if (required.item() == Items.FLINT_AND_STEEL) {
+            if (!player.isCreative()) {
+                stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(player.getUsedItemHand()));
+            }
+            fireCannon(serverLevel);
+            setOwner(player);
+            setLoadStage(0);
             return InteractionResult.SUCCESS;
         }
 
         if (!player.isCreative()) {
-            if (def.consumesItem()) {
-                if (stack.getCount() < def.amount()) {
-                    player.displayClientMessage(
-                            Component.translatable(
-                                    "siege.loading.need_amount",
-                                    def.amount(),
-                                    expected.getDefaultInstance().getHoverName()
-                            ),
-                            true
-                    );
-                    return InteractionResult.FAIL;
-                }
-                stack.shrink(def.amount());
+            if (required.consumesItem() && stack.getCount() < required.amount()) {
+                player.displayClientMessage(
+                        Component.translatable("siege.loading.need_amount", required.amount(),
+                                required.item().getDefaultInstance().getHoverName()), true);
+                return InteractionResult.FAIL;
             }
 
-            if (def.damagesItem()) {
-                stack.hurtAndBreak(1, player,
-                        p -> p.broadcastBreakEvent(player.getUsedItemHand()));
+            if (required.consumesItem()) stack.shrink(required.amount());
+            if (required.damagesItem()) {
+                stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(player.getUsedItemHand()));
             }
         }
 
         setLoadStage(stage + 1);
 
-        if (getLoadStage() == 4) {
-            triggerAnim("anim_controller", "loaded");
-        }
-
-        if (getLoadStage() == 5 && getFirstPassenger() == null) {
-            this.setOwner(player);
-            fireCannon(serverLevel);
+        if (getLoadStage() == LOAD_STAGES.length - 1) {
+            triggerAnimation("loaded");
         }
 
         return InteractionResult.SUCCESS;
     }
 
     private void fireCannon(ServerLevel serverLevel) {
-        triggerAnim("anim_controller", "fire");
+        triggerAnimation("fire");
+
         CannonProjectile projectile = new CannonProjectile(ModEntities.CANNON_BALL, this, serverLevel);
-
         Vec3 mouthPos = getMouthOffset();
-
         projectile.setPos(mouthPos.x, mouthPos.y, mouthPos.z);
 
-        double blocksPerTick = this.getProjectileSpeed() / 20.0;
-        float accuracyDegrees = getAccuracyMultiplier();
-        float yawOffset = (random.nextFloat() - 0.5f) * 4 * accuracyDegrees;
-        float pitchOffset = (random.nextFloat() - 0.5f) * 4 * accuracyDegrees;
-        float adjustedYaw = this.getVisualRotationYInDegrees() + yawOffset;
-        float adjustedPitch = this.getXRot() + pitchOffset;
-        float yawRad = adjustedYaw * (float) (Math.PI / 180.0);
-        float pitchRad = adjustedPitch * (float) (Math.PI / 180.0);
-        double x = -Math.sin(yawRad) * Math.cos(pitchRad);
-        double y = -Math.sin(pitchRad);
-        double z = Math.cos(yawRad) * Math.cos(pitchRad);
-        Vec3 direction = new Vec3(x, y, z).normalize();
-        Vec3 velocity = direction.scale(blocksPerTick);
-        projectile.setDeltaMovement(velocity);
-
+        Vec3 direction = calculateProjectileDirection();
+        projectile.setDeltaMovement(direction.scale(getProjectileSpeed() / 20.0));
         projectile.setBaseDamage(getBaseDamage());
         projectile.setDamageType(SCDamageCalculator.DamageType.BLUDGEONING);
         projectile.setOwner(this);
 
         serverLevel.addFreshEntity(projectile);
 
-        serverLevel.players().forEach(p -> {
-            double distance = p.position().distanceTo(this.position());
+        serverLevel.sendParticles(ParticleTypes.SMOKE, mouthPos.x, mouthPos.y, mouthPos.z,
+                20, 0.05, 0.05, 0.05, 0.01);
 
-            if (distance <= 200) {
-                float closeVolume;
-                float distantVolume = 0f;
-
-                if (distance <= 50) {
-                    closeVolume = 1.0f;
-                } else {
-                    float t = (float) ((distance - 50) / 150.0); // normalize 51–200 -> 0–1
-                    closeVolume = 1.0f - t;                     // fades out
-                    distantVolume = t;                          // fades in
-                }
-
-                if (closeVolume > 0f) {
-                    p.playNotifySound(ModSounds.CANNON_CLOSE, SoundSource.AMBIENT, closeVolume, 1.0f);
-                }
-
-                if (distantVolume > 0f) {
-                    p.playNotifySound(ModSounds.CANNON_DISTANT, SoundSource.AMBIENT, distantVolume, 1.0f);
-                }
-            }
-        });
+        playShootSound(serverLevel);
 
         setLoadStage(0);
         setCooldown(90);
-
-        ((ServerLevel) this.level()).sendParticles(
-                ParticleTypes.SMOKE,
-                mouthPos.x, mouthPos.y, mouthPos.z,
-                20,      // count
-                0.05, 0.05, 0.05, // offset
-                0.01    // speed
-        );
-
-        spawnParticleTrail(serverLevel, velocity.normalize(), mouthPos, ModParticles.MUZZLES_SMOKE_PARTICLE, 50, 0.2f, 0.0005f, 5);
-        spawnParticleTrail(serverLevel, velocity.normalize(), mouthPos, ModParticles.MUZZLES_FLASH_PARTICLE, 1, 0f, 0.1f, 6);
     }
 
-    private static void spawnParticleTrail(ServerLevel serverLevel, Vec3 direction, Vec3 pos, ParticleOptions particle, int count, float delta, float spread, int distance) {
-        List<Vec3> trailPositions = new ArrayList<>();
-        for (int i = 0; i < distance; i++) {
-            trailPositions.add(pos.add(direction.scale(i)));
-        }
+    private Vec3 calculateProjectileDirection() {
+        float accuracyDegrees = getAccuracyMultiplier();
+        float yawOffset = (random.nextFloat() - 0.5f) * 4 * accuracyDegrees;
+        float pitchOffset = (random.nextFloat() - 0.5f) * 4 * accuracyDegrees;
 
-        for (Vec3 blockPos : trailPositions) {
-            serverLevel.sendParticles(particle, blockPos.x, blockPos.y, blockPos.z, count, delta, delta, delta, spread);
+        float adjustedYaw = getVisualRotationYInDegrees() + yawOffset;
+        float adjustedPitch = getXRot() + pitchOffset;
+
+        float yawRad = (float) Math.toRadians(adjustedYaw);
+        float pitchRad = (float) Math.toRadians(adjustedPitch);
+
+        return new Vec3(
+                -Math.sin(yawRad) * Math.cos(pitchRad),
+                -Math.sin(pitchRad),
+                Math.cos(yawRad) * Math.cos(pitchRad)
+        ).normalize();
+    }
+
+    private Vec3 getMouthOffset() {
+        float yawRad = (float) Math.toRadians(getVisualRotationYInDegrees());
+        double forward = 1.4;
+        return new Vec3(
+                getX() - Math.sin(yawRad) * forward,
+                getY() + 1.0 - Math.sin(Math.toRadians(getXRot())),
+                getZ() + Math.cos(yawRad) * forward
+        );
+    }
+
+    @Override
+    public void onSiegeTick(ServerLevel serverLevel) {
+        if (getLoadStage() != 4 && getLoadStage() != 5 && getCooldown() <= 10) {
+            triggerAnimation("unloaded");
         }
     }
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar registrar) {
-
-        registrar.add(
-                new AnimationController<>(this, "anim_controller", 0, state -> {
-
-                    if (state.isCurrentAnimation(fire)) {
-                        return PlayState.CONTINUE;
-                    }
-
-                    if (getLoadStage() >= 4) {
-                        state.setAnimation(loaded);
-                    } else {
-                        state.setAnimation(unloaded);
-                    }
-
-                    return PlayState.CONTINUE;
-                })
-                        .triggerableAnim("fire", fire)
-                        .triggerableAnim("loaded", loaded)
-                        .triggerableAnim("unloaded", unloaded)
-        );
+        registrar.add(new AnimationController<>(this, "anim_controller", 0, state -> {
+            if (state.isCurrentAnimation(fireAnim)) return PlayState.CONTINUE;
+            state.setAnimation(getLoadStage() >= 4 ? loadedAnim : unloadedAnim);
+            return PlayState.CONTINUE;
+        }).triggerableAnim("fire", fireAnim)
+                .triggerableAnim("loaded", loadedAnim)
+                .triggerableAnim("unloaded", unloadedAnim));
     }
 
     @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.animatableInstanceCache;
+    public void triggerAnimation(String name) {
+        switch (name) {
+            case "fire" -> triggerAnim("anim_controller", "fire");
+            case "loaded" -> triggerAnim("anim_controller", "loaded");
+            case "unloaded" -> triggerAnim("anim_controller", "unloaded");
+        }
     }
 
     @Override
-    public void tick() {
-        super.tick();
+    public void stopAnimation(String name) {
 
-        if (!(this.level() instanceof ServerLevel serverLevel)) {
-            return;
-        }
-
-        boolean isMoving = this.getDeltaMovement().x != 0 || this.getDeltaMovement().y != 0;
-
-        if (isMoving && isAlive()) {
-            if (this.moveTick >= 140 || this.moveTick == 0) {
-                serverLevel.players().forEach(p -> {
-                    if (p.position().distanceTo(this.position()) <= 30) {
-                        p.playNotifySound(ModSounds.SIEGE_ENGINE_MOVE, SoundSource.AMBIENT, (float) (1.0f - p.position().distanceTo(this.position()) / 30), 1.0f);
-                    }
-                });
-                if (this.moveTick != 0) this.moveTick = 0;
-            }
-            moveTick++;
-        } else if (this.moveTick != 0 || !isAlive()) {
-            this.moveTick = 0;
-            serverLevel.players().forEach(p -> {
-                p.connection.send(new ClientboundStopSoundPacket(ModSounds.SIEGE_ENGINE_MOVE.getLocation(), SoundSource.AMBIENT));
-            });
-        }
-
-        if (getLoadStage() != 4 && getLoadStage() != 5 && getCooldown() <= 10) {
-            triggerAnim("anim_controller", "unloaded");
-        }
-        setCooldown(Math.max(0, getCooldown() - 1));
     }
 
-    private Vec3 getMouthOffset() {
-        float yawRad = (float) Math.toRadians(this.getVisualRotationYInDegrees());
-
-        double forward = 1.4;
-        double up = 1;
-        double x = this.getX() - Math.sin(yawRad) * forward;
-        double y = this.getY() + up - Math.sin(Math.toRadians(this.getXRot()));
-        double z = this.getZ() + Math.cos(yawRad) * forward;
-
-        return new Vec3(x, y, z);
-    }
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() { return animatableInstanceCache; }
 
     @Override
     public Vec3 getPassengerOffset(Entity entity) {
-        if (entity instanceof Horse) {
-            return new Vec3(0.0, 0.0, -1.5); // Left, Up, Back
-        }
-        return new Vec3(0.5, 0.0, 1.0);
+        return entity instanceof Horse ? new Vec3(0.0, 0.0, -1.5) : new Vec3(0.5, 0.0, 1.0);
     }
 
     @Override
-    public Vec3 getPlayerPOV() {
-        return new Vec3(0.0, 0.0, 0.0);
-    }
-
-    private static final SiegesLoadableItems[] LOAD_STAGES = new SiegesLoadableItems[]{
-            new SiegesLoadableItems(SCItems.BLACK_POWDER, 10, true, false),
-            new SiegesLoadableItems(KSItems.RAMROD, 1, false, true),
-            new SiegesLoadableItems(Items.STONE, 1, true, false),
-            new SiegesLoadableItems(KSItems.RAMROD, 1, false, true),
-            new SiegesLoadableItems(Items.FLINT_AND_STEEL, 1, false, true)
-    };
+    public Vec3 getPlayerPOV() { return Vec3.ZERO; }
 }

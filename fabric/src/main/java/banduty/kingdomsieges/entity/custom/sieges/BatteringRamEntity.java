@@ -2,17 +2,10 @@ package banduty.kingdomsieges.entity.custom.sieges;
 
 import banduty.kingdomsieges.sounds.ModSounds;
 import banduty.stoneycore.entity.custom.AbstractSiegeEntity;
-import banduty.stoneycore.lands.util.Land;
-import banduty.stoneycore.lands.util.LandState;
-import banduty.stoneycore.siege.SiegeManager;
+import banduty.stoneycore.entity.custom.siegeentity.SiegeProperties;
 import banduty.stoneycore.util.BlockDamageTracker;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -22,6 +15,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -35,20 +29,23 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
-
 public class BatteringRamEntity extends AbstractSiegeEntity implements GeoEntity {
-    private int moveTick;
-    private final Random random = new Random();
-    private final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
-    private final RawAnimation attack = RawAnimation.begin().then("attack", Animation.LoopType.PLAY_ONCE);
-    protected static final EntityDataAccessor<Boolean> ATTACK_HAPPENED;
 
-    static {
-        ATTACK_HAPPENED = SynchedEntityData.defineId(BatteringRamEntity.class, EntityDataSerializers.BOOLEAN);
-    }
+    private static final SiegeProperties PROPERTIES = SiegeProperties.builder("battering_ram")
+            .health(150.0)
+            .speed(0.025)
+            .knockbackResist(265.0)
+            .moveSound(ModSounds.SIEGE_ENGINE_MOVE)
+            .reloadSound(ModSounds.ROPE_CHARGE_BR)
+            .attackSound(ModSounds.RAM_IMPACT)
+            .moveSoundDelay(150)
+            .moveSoundRange(30.0)
+            .reloadSoundRange(15.0)
+            .attackSoundRange(40.0)
+            .build();
+
+    private final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
+    private final RawAnimation attackAnim = RawAnimation.begin().then("attack", Animation.LoopType.PLAY_ONCE);
 
     public BatteringRamEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
@@ -62,150 +59,44 @@ public class BatteringRamEntity extends AbstractSiegeEntity implements GeoEntity
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(ATTACK_HAPPENED, true);
-    }
+    public SiegeProperties getProperties() { return PROPERTIES; }
 
-    public void setAttackHappened(boolean attackHappened) {
-        this.entityData.set(ATTACK_HAPPENED, attackHappened);
-    }
+    @Override
+    public InteractionResult handleSiegeInteraction(Player player, InteractionHand hand, ServerLevel serverLevel) {
+        if (getFirstPassenger() != null) return InteractionResult.FAIL;
 
-    public boolean getAttackHappened() {
-        return this.entityData.get(ATTACK_HAPPENED);
+        ItemStack itemStack = player.getItemInHand(hand);
+
+        if (itemStack.isEmpty() && canAddPassenger(player) && !player.isShiftKeyDown()) {
+            player.startRiding(this);
+            setOwner(player);
+            return InteractionResult.SUCCESS;
+        }
+
+        if (getCooldown() <= 0 && player.isShiftKeyDown()) {
+            triggerAnimation("attack");
+            setAttackHappened(false);
+            setCooldown(50);
+            setOwner(this);
+            playReloadSound(serverLevel);
+            return InteractionResult.SUCCESS;
+        }
+
+        return InteractionResult.PASS;
     }
 
     @Override
-    public boolean canAddPassenger(Entity entity) {
-        return this.getPassengers().isEmpty() && (entity instanceof Player || entity instanceof Horse);
-    }
-
-    @Override
-    public InteractionResult interact(Player player, InteractionHand hand) {
-        if (!(this.level() instanceof ServerLevel serverLevel) || hand != InteractionHand.MAIN_HAND) {
-            return super.interact(player, hand);
-        }
-
-        super.interact(player, hand);
-
-        UUID playerId = player.getUUID();
-
-        // Siege check
-        Optional<SiegeManager.Siege> siegeOpt = SiegeManager.getPlayerSiege(serverLevel, playerId);
-        if (siegeOpt.map(siege -> siege.isDisabled(playerId)).orElse(false)) {
-            return InteractionResult.FAIL;
-        }
-
-        // Land ownership check
-        LandState stateManager = LandState.get(serverLevel);
-        Optional<Land> maybeLand = stateManager.getLandAt(this.getOnPos());
-        boolean isOwnerOrAlly = maybeLand
-                .map(land -> land.getOwnerUUID().equals(playerId) || land.isAlly(playerId) || player.isCreative())
-                .orElse(true);
-        if (!isOwnerOrAlly) {
-            return InteractionResult.FAIL;
-        }
-
-        // Passenger check
-        if (this.getFirstPassenger() != null) return InteractionResult.FAIL;
-
-        // Interaction logic
-        if (this.getCooldown() <= 0 && player.isShiftKeyDown()) {
-            this.triggerAnim("anim_controller", "attack");
-            this.setAttackHappened(false);
-            this.setCooldown(50);
-            this.setOwner(this);
-
-            serverLevel.players().forEach(p -> {
-                double distance = p.position().distanceTo(this.position());
-
-                if (distance <= 15) {
-                    float t = (float)(distance / 15.0); // normalize 0–15 -> 0–1
-                    float volume = 1.0f - t;            // fades out
-
-                    if (volume > 0f) {
-                        p.playNotifySound(ModSounds.ROPE_CHARGE_BR, SoundSource.AMBIENT, volume, random.nextFloat(0.75f, 1.25f));
-                    }
-                }
-            });
-        }
-
-        return InteractionResult.SUCCESS;
-    }
-
-    @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-        controllerRegistrar.add(new AnimationController<>(this,"anim_controller", state -> PlayState.STOP)
-                .triggerableAnim("attack", attack));
-
-    }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.animatableInstanceCache;
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-
-        if (!(this.level() instanceof ServerLevel serverLevel)) {
-            return;
-        }
-
-        boolean isMoving = this.getDeltaMovement().x != 0 || this.getDeltaMovement().z != 0;
-
-        if (isMoving && isAlive()) {
-            if (this.moveTick >= 150 || this.moveTick == 0) {
-                serverLevel.players().forEach(p -> {
-                    if (p.position().distanceTo(this.position()) <= 30) {
-                        p.playNotifySound(ModSounds.SIEGE_ENGINE_MOVE, SoundSource.AMBIENT, (float) (1.0f - p.position().distanceTo(this.position()) / 30), 1.0f);
-                    }
-                });
-                if (this.moveTick != 0) this.moveTick = 0;
-            }
-            moveTick++;
-        } else if (this.moveTick != 0 || !isAlive()) {
-            this.moveTick = 0;
-            serverLevel.players().forEach(p -> {
-                p.connection.send(new ClientboundStopSoundPacket(ModSounds.SIEGE_ENGINE_MOVE.getLocation(), SoundSource.AMBIENT));
-            });
-        }
-
-        this.setCooldown(this.getCooldown() - 1);
-
+    public void onSiegeTick(ServerLevel serverLevel) {
         BlockDamageTracker.clean(serverLevel);
 
-        if (this.getCooldown() <= 6 && !this.getAttackHappened()) {
-            // Destroy blocks in front
-            destroyBlocksInFront();
-
-            this.setAttackHappened(true);
-
-            serverLevel.players().forEach(p -> {
-                double distance = p.position().distanceTo(this.position());
-
-                if (distance <= 40) {
-                    float volume;
-
-                    if (distance <= 5) {
-                        volume = 1.0f;
-                    } else {
-                        float t = (float)((distance - 5) / 35.0); // normalize 6–40 -> 0–1
-                        volume = 1.0f - t;                     // fades out
-                    }
-
-                    if (volume > 0f) {
-                        p.playNotifySound(ModSounds.RAM_IMPACT, SoundSource.AMBIENT, volume, random.nextFloat(0.75f, 1.25f));
-                    }
-                }
-            });
+        if (getCooldown() <= 6 && !hasAttackHappened()) {
+            performAttack(serverLevel);
+            setAttackHappened(true);
+            playAttackSound(serverLevel);
         }
     }
 
-    private void destroyBlocksInFront() {
-        if (!(this.level() instanceof ServerLevel serverLevel)) return;
-
+    private void performAttack(ServerLevel serverLevel) {
         Vec3 lookVec = this.getViewVector(1.0F).normalize();
         Vec3 front = this.position().add(lookVec.scale(2.5));
 
@@ -216,22 +107,20 @@ public class BatteringRamEntity extends AbstractSiegeEntity implements GeoEntity
         double radius = 1.5;
         Vec3 boxCenter = new Vec3(baseX + 0.5, baseY, baseZ + 0.5);
         Vec3 knockbackDir = this.getViewVector(1.0F).normalize().scale(2.5);
-
         float baseDamage = (float) getBaseDamage();
 
-        serverLevel.getEntities(this,
-                new AABB(
+        // Damage entities
+        serverLevel.getEntities(this, new AABB(
                         boxCenter.x - radius, boxCenter.y - 1, boxCenter.z - radius,
                         boxCenter.x + radius, boxCenter.y + 2, boxCenter.z + radius
-                ),
-                entity -> entity instanceof LivingEntity && !(entity instanceof Player playerEntity && playerEntity.isCreative())
+                ), entity -> entity instanceof LivingEntity && !(entity instanceof Player player && player.isCreative())
         ).forEach(entity -> {
-            entity.hurt(serverLevel.damageSources().mobAttack((LivingEntity) this.getOwner()), baseDamage);
-            Vec3 knockback = new Vec3(knockbackDir.x, 0.25, knockbackDir.z);
-            entity.addDeltaMovement(knockback);
+            entity.hurt(serverLevel.damageSources().mobAttack((LivingEntity) getOwner()), baseDamage);
+            entity.addDeltaMovement(new Vec3(knockbackDir.x, 0.25, knockbackDir.z));
             entity.hurtMarked = true;
         });
 
+        // Damage blocks
         for (int y = -1; y <= 1; y++) {
             for (int x = -1; x <= 1; x++) {
                 for (int z = -1; z <= 1; z++) {
@@ -242,7 +131,6 @@ public class BatteringRamEntity extends AbstractSiegeEntity implements GeoEntity
 
                     float hardness = state.getDestroySpeed(serverLevel, pos);
                     float damageFactor = 1.0f / (40 / baseDamage);
-
                     BlockDamageTracker.damageBlock(serverLevel, pos, damageFactor, hardness);
                 }
             }
@@ -250,11 +138,27 @@ public class BatteringRamEntity extends AbstractSiegeEntity implements GeoEntity
     }
 
     @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar registrar) {
+        registrar.add(new AnimationController<>(this, "anim_controller", state -> PlayState.STOP)
+                .triggerableAnim("attack", attackAnim));
+    }
+
+    @Override
+    public void triggerAnimation(String name) {
+        if ("attack".equals(name)) triggerAnim("anim_controller", "attack");
+    }
+
+    @Override
+    public void stopAnimation(String name) {}
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return animatableInstanceCache;
+    }
+
+    @Override
     public Vec3 getPassengerOffset(Entity entity) {
-        if (entity instanceof Horse) {
-            return new Vec3(0.0, 0.0, -1.25); // Left, Up, Back
-        }
-        return new Vec3(0.0, 0.0, 1.25);
+        return entity instanceof Horse ? new Vec3(0.0, 0.0, -1.25) : new Vec3(0.0, 0.0, 1.25);
     }
 
     @Override

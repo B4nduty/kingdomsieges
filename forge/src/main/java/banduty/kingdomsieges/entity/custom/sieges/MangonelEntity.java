@@ -3,21 +3,14 @@ package banduty.kingdomsieges.entity.custom.sieges;
 import banduty.kingdomsieges.entity.ModEntities;
 import banduty.kingdomsieges.entity.custom.projectiles.TrebuchetProjectile;
 import banduty.kingdomsieges.sounds.ModSounds;
-import banduty.kingdomsieges.util.sieges.SiegesLoadableItems;
 import banduty.stoneycore.entity.custom.AbstractSiegeEntity;
-import banduty.stoneycore.lands.util.Land;
-import banduty.stoneycore.lands.util.LandState;
-import banduty.stoneycore.siege.SiegeManager;
+import banduty.stoneycore.entity.custom.siegeentity.LoadingStage;
+import banduty.stoneycore.entity.custom.siegeentity.SiegeProperties;
 import banduty.stoneycore.util.SCDamageCalculator;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -41,25 +34,31 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
-
 public class MangonelEntity extends AbstractSiegeEntity implements GeoEntity {
-    private final Random random = new Random();
-    private int moveTick;
+
+    private static final SiegeProperties PROPERTIES = SiegeProperties.builder("mangonel")
+            .health(60.0)
+            .speed(0.075)
+            .knockbackResist(265.0)
+            .moveSound(ModSounds.SIEGE_ENGINE_MOVE.get())
+            .reloadSound(ModSounds.ROPE_CHARGE_GN.get())
+            .shootSound(ModSounds.MANGONEL_SHOOT.get())
+            .moveSoundDelay(150)
+            .moveSoundRange(30.0)
+            .reloadSoundRange(15.0)
+            .shootSoundRange(75.0)
+            .build();
+
+    private static final LoadingStage[] AMMO_LOADS = {
+            LoadingStage.of(Items.STONE),
+            LoadingStage.of(Items.MAGMA_BLOCK)
+    };
+
     private final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
-    private final RawAnimation shoot = RawAnimation.begin().then("shoot", Animation.LoopType.PLAY_ONCE);
-    private final RawAnimation reloading = RawAnimation.begin().then("reloading", Animation.LoopType.PLAY_ONCE);
-    private final RawAnimation loaded = RawAnimation.begin().then("loaded", Animation.LoopType.PLAY_ONCE);
-    private final RawAnimation unloaded = RawAnimation.begin().then("unloaded", Animation.LoopType.PLAY_ONCE);
-    protected static final EntityDataAccessor<String> AMMO_LOADED;
-
-    static {
-        AMMO_LOADED = SynchedEntityData.defineId(MangonelEntity.class, EntityDataSerializers.STRING);
-    }
-
-    public int reloadingTime;
+    private final RawAnimation shootAnim = RawAnimation.begin().then("shoot", Animation.LoopType.PLAY_ONCE);
+    private final RawAnimation reloadingAnim = RawAnimation.begin().then("reloading", Animation.LoopType.PLAY_ONCE);
+    private final RawAnimation loadedAnim = RawAnimation.begin().then("loaded", Animation.LoopType.PLAY_ONCE);
+    private final RawAnimation unloadedAnim = RawAnimation.begin().then("unloaded", Animation.LoopType.PLAY_ONCE);
 
     public MangonelEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
@@ -73,169 +72,101 @@ public class MangonelEntity extends AbstractSiegeEntity implements GeoEntity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(AMMO_LOADED, "");
-    }
+    public SiegeProperties getProperties() { return PROPERTIES; }
 
     @Override
-    public boolean canAddPassenger(Entity entity) {
-        return this.getPassengers().isEmpty() && (entity instanceof Player || entity instanceof Horse);
-    }
+    public InteractionResult handleSiegeInteraction(Player player, InteractionHand hand, ServerLevel serverLevel) {
+        if (getFirstPassenger() != null) return InteractionResult.FAIL;
+        if (getCooldown() > 0) return InteractionResult.FAIL;
 
-    public String getAmmoLoaded() {
-        return this.entityData.get(AMMO_LOADED);
-    }
-
-    public void setAmmoLoaded(String ammoLoaded) {
-        this.entityData.set(AMMO_LOADED, ammoLoaded);
-    }
-
-    public int getReloadingTime() {
-        return reloadingTime;
-    }
-
-    public void setReloadingTime(int reloadingTime) {
-        this.reloadingTime = reloadingTime;
-    }
-
-    @Override
-    public InteractionResult interact(Player player, InteractionHand hand) {
-        if (!(this.level() instanceof ServerLevel serverLevel) || hand != InteractionHand.MAIN_HAND) {
-            return super.interact(player, hand);
-        }
-
-        super.interact(player, hand);
-
-        UUID playerId = player.getUUID();
-
-        // Siege check
-        Optional<SiegeManager.Siege> siegeOpt = SiegeManager.getPlayerSiege(serverLevel, playerId);
-        if (siegeOpt.map(siege -> siege.isDisabled(playerId)).orElse(false)) {
-            return InteractionResult.FAIL;
-        }
-
-        // Land ownership check
-        LandState stateManager = LandState.get(serverLevel);
-        Optional<Land> maybeLand = stateManager.getLandAt(this.getOnPos());
-        boolean isOwnerOrAlly = maybeLand
-                .map(land -> land.getOwnerUUID().equals(playerId) || land.isAlly(playerId) || player.isCreative())
-                .orElse(true);
-        if (!isOwnerOrAlly) {
-            return InteractionResult.FAIL;
-        }
-
-        // Passenger check
-        if (this.getFirstPassenger() != null) return InteractionResult.FAIL;
-
-        // Interaction logic
-        int cooldown = getCooldown();
         ItemStack itemStack = player.getItemInHand(hand);
-        if (cooldown > 0) return InteractionResult.FAIL;
 
-        if (getAmmoLoaded().isEmpty()) {
+        if (itemStack.isEmpty() && canAddPassenger(player) && !player.isShiftKeyDown()) {
+            player.startRiding(this);
+            setOwner(player);
+            return InteractionResult.SUCCESS;
+        }
 
-            SiegesLoadableItems match = null;
-
-            for (SiegesLoadableItems s : AMMO_LOADS) {
-                if (itemStack.is(s.item())) {
-                    match = s;
-                    break;
-                }
-            }
+        if (!hasAmmoLoaded()) {
+            LoadingStage match = findMatchingAmmo(itemStack);
 
             if (match == null) {
-
-                Component ammoList =
-                        AMMO_LOADS[0].item().getDefaultInstance().getHoverName()
-                                .copy()
-                                .append(", ")
-                                .append(AMMO_LOADS[1].item().getDefaultInstance().getHoverName());
-
-                player.displayClientMessage(
-                        Component.translatable("siege.loading.need_one_of", ammoList),
-                        true
-                );
-
+                showAmmoListMessage(player);
                 return InteractionResult.FAIL;
             }
 
             if (!player.isCreative()) {
+                if (itemStack.getCount() < match.amount()) {
+                    player.displayClientMessage(
+                            Component.translatable("siege.loading.need_amount", match.amount(),
+                                    match.item().getDefaultInstance().getHoverName()), true);
+                    return InteractionResult.FAIL;
+                }
                 itemStack.shrink(match.amount());
             }
 
-            setAmmoLoaded(match.item().toString()); // store id string
-            setReloadingTime(getBaseReload());
-
-            triggerAnim("anim_controller", "reloading");
-
+            setAmmoLoaded(match.item().toString());
+            setReloadTime(getBaseReload());
+            triggerAnimation("reloading");
             playReloadSound(serverLevel);
-
             return InteractionResult.SUCCESS;
         }
 
-        if (getReloadingTime() == 0) {
-            triggerAnim("anim_controller", "shoot");
+        if (isReloadComplete()) {
+            triggerAnimation("shoot");
             setCooldown(10);
-            serverLevel.players().forEach(p -> {
-                double distance = p.position().distanceTo(this.position());
-
-                if (distance <= 75) {
-                    float t = (float) (distance / 75.0); // normalize 0–15 -> 0–1
-                    float volume = 1.0f - t;            // fades out
-
-                    if (volume > 0f) {
-                        p.playNotifySound(ModSounds.MANGONEL_SHOOT.get(), SoundSource.AMBIENT, volume, random.nextFloat(0.75f, 1.25f));
-                    }
-                }
-            });
-            this.setOwner(player);
+            playShootSound(serverLevel);
+            setOwner(player);
         }
 
         return InteractionResult.SUCCESS;
     }
 
-    private void playReloadSound(ServerLevel serverLevel) {
-        serverLevel.players().forEach(p -> {
-            double distance = p.position().distanceTo(this.position());
+    private LoadingStage findMatchingAmmo(ItemStack stack) {
+        for (LoadingStage stage : AMMO_LOADS) {
+            if (stack.is(stage.item())) return stage;
+        }
+        return null;
+    }
 
-            if (distance <= 15) {
-                float t = (float) (distance / 15.0);
-                float volume = 1.0f - t;
+    private void showAmmoListMessage(Player player) {
+        Component ammoList = AMMO_LOADS[0].item().getDefaultInstance().getHoverName()
+                .copy().append(", ").append(AMMO_LOADS[1].item().getDefaultInstance().getHoverName());
+        player.displayClientMessage(Component.translatable("siege.loading.need_one_of", ammoList), true);
+    }
 
-                if (volume > 0f) {
-                    p.playNotifySound(
-                            ModSounds.ROPE_CHARGE_GN.get(),
-                            SoundSource.AMBIENT,
-                            volume,
-                            random.nextFloat(0.75f, 1.25f)
-                    );
-                }
+    @Override
+    public void onSiegeTick(ServerLevel serverLevel) {
+        if (hasAmmoLoaded()) {
+            if (isReloadComplete() && getCooldown() <= 0) {
+                triggerAnimation("loaded");
             }
-        });
+            if (getCooldown() == 7) {
+                fireMangonel(serverLevel);
+            }
+        } else if (getCooldown() <= 0 && isReloadComplete()) {
+            triggerAnimation("unloaded");
+        }
     }
 
     private void fireMangonel(ServerLevel serverLevel) {
         TrebuchetProjectile projectile = new TrebuchetProjectile(ModEntities.TREBUCHET_PROJECTILE.get(), this, serverLevel);
-
-        projectile.setPos(this.getX(), this.getY() + 2.25d, this.getZ());
+        projectile.setPos(this.getX(), this.getY() + 2.25, this.getZ());
 
         double blocksPerTick = getProjectileSpeed() / 20.0;
         float accuracyDegrees = getAccuracyMultiplier();
         float yawOffset = (random.nextFloat() - 0.5f) * 4 * accuracyDegrees;
         float adjustedYaw = this.getVisualRotationYInDegrees() + yawOffset;
-        float yawRad = adjustedYaw * (float) (Math.PI / 180.0);
-        double x = -Math.sin(yawRad);
-        double z = Math.cos(yawRad);
-        Vec3 direction = new Vec3(x, 0, z).normalize();
+        float yawRad = (float) Math.toRadians(adjustedYaw);
+
+        Vec3 direction = new Vec3(-Math.sin(yawRad), 0, Math.cos(yawRad)).normalize();
         projectile.setDeltaMovement(direction.scale(blocksPerTick));
 
         projectile.setBaseDamage(getBaseDamage());
         projectile.setDamageType(SCDamageCalculator.DamageType.BLUDGEONING);
         projectile.setOwner(this);
 
-        Item loadedItem = BuiltInRegistries.ITEM
-                .get(ResourceLocation.tryParse(getAmmoLoaded()));
+        Item loadedItem = BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(getAmmoLoaded()));
 
         if (loadedItem == Items.STONE) {
             projectile.setImpactMode(TrebuchetProjectile.ImpactMode.BREAK_BLOCKS);
@@ -246,100 +177,44 @@ public class MangonelEntity extends AbstractSiegeEntity implements GeoEntity {
         }
 
         serverLevel.addFreshEntity(projectile);
-
         setAmmoLoaded("");
     }
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar registrar) {
-
-        registrar.add(
-                new AnimationController<>(this, "anim_controller", 0, state -> {
-
-                    // if a trigger animation is currently playing → let it continue
-                    if (state.isCurrentAnimation(shoot) || state.isCurrentAnimation(reloading)) {
-                        return PlayState.CONTINUE;
-                    }
-
-                    // default machine state logic
-                    if (!getAmmoLoaded().isEmpty()) {
-
-                        if (getReloadingTime() > 0) {
-                            state.setAnimation(reloading);
-                        } else {
-                            state.setAnimation(loaded);
-                        }
-
-                    } else {
-                        state.setAnimation(unloaded);
-                    }
-                    
-                    return PlayState.CONTINUE;
-                })
-                        .triggerableAnim("shoot", shoot)
-                        .triggerableAnim("reloading", reloading)
-                        .triggerableAnim("loaded", loaded)
-                        .triggerableAnim("unloaded", unloaded)
-                        .setAnimationSpeed(100d / getBaseReload())
-        );
+        registrar.add(new AnimationController<>(this, "anim_controller", state -> PlayState.STOP)
+                .triggerableAnim("shoot", shootAnim)
+                .triggerableAnim("reloading", reloadingAnim)
+                .setAnimationSpeed(100.0 / getBaseReload())
+                .triggerableAnim("loaded", loadedAnim)
+                .triggerableAnim("unloaded", unloadedAnim));
     }
+
+    @Override
+    public void triggerAnimation(String name) {
+        switch (name) {
+            case "shoot" -> triggerAnim("anim_controller", "shoot");
+            case "reloading" -> triggerAnim("anim_controller", "reloading");
+            case "loaded" -> triggerAnim("anim_controller", "loaded");
+            case "unloaded" -> triggerAnim("anim_controller", "unloaded");
+        }
+    }
+
+    @Override
+    public void stopAnimation(String name) {}
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.animatableInstanceCache;
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-
-        if (!(this.level() instanceof ServerLevel serverLevel)) {
-            return;
-        }
-
-        boolean isMoving = this.getDeltaMovement().x != 0 || this.getDeltaMovement().y != 0;
-
-        if (isMoving && isAlive()) {
-            if (this.moveTick >= 150 || this.moveTick == 0) {
-                serverLevel.players().forEach(p -> {
-                    if (p.position().distanceTo(this.position()) <= 30) {
-                        p.playNotifySound(ModSounds.SIEGE_ENGINE_MOVE.get(), SoundSource.AMBIENT, (float) (1.0f - p.position().distanceTo(this.position()) / 30), 1.0f);
-                    }
-                });
-                if (this.moveTick != 0) this.moveTick = 0;
-            }
-            moveTick++;
-        } else if (this.moveTick != 0 || !isAlive()) {
-            this.moveTick = 0;
-            serverLevel.players().forEach(p -> {
-                p.connection.send(new ClientboundStopSoundPacket(ModSounds.SIEGE_ENGINE_MOVE.get().getLocation(), SoundSource.AMBIENT));
-            });
-        }
-
-        if (getAmmoLoaded() != null && !getAmmoLoaded().isEmpty()) {
-            if (getReloadingTime() <= 0 && getCooldown() <= 0) triggerAnim("anim_controller", "loaded");
-            if (getCooldown() == 7) fireMangonel(serverLevel);
-        } else if (getCooldown() <= 0 && getReloadingTime() <= 0) triggerAnim("anim_controller", "unloaded");
-
-        setReloadingTime(Math.max(0, getReloadingTime() - 1));
-        setCooldown(Math.max(0, getCooldown() - 1));
+        return animatableInstanceCache;
     }
 
     @Override
     public Vec3 getPassengerOffset(Entity entity) {
-        if (entity instanceof Horse) {
-            return new Vec3(0.0, 0.0, -1.25); // Left, Up, Back
-        }
-        return new Vec3(0.0, 0.0, 2.0);
+        return entity instanceof Horse ? new Vec3(0.0, 0.0, -1.25) : new Vec3(0.0, 0.0, 2.0);
     }
 
     @Override
     public Vec3 getPlayerPOV() {
         return new Vec3(0.0, -0.7f, 0.0);
     }
-
-    private static final SiegesLoadableItems[] AMMO_LOADS = new SiegesLoadableItems[]{ //what ammo can be loaded
-            new SiegesLoadableItems(Items.STONE, 1, true, false),
-            new SiegesLoadableItems(Items.MAGMA_BLOCK, 1, true, false)
-    };
 }
