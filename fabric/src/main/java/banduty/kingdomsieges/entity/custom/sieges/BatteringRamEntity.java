@@ -109,7 +109,6 @@ public class BatteringRamEntity extends AbstractSiegeEntity implements GeoEntity
         Vec3 knockbackDir = this.getViewVector(1.0F).normalize().scale(2.5);
         float baseDamage = (float) getBaseDamage();
 
-        // Damage entities
         serverLevel.getEntities(this, new AABB(
                         boxCenter.x - radius, boxCenter.y - 1, boxCenter.z - radius,
                         boxCenter.x + radius, boxCenter.y + 2, boxCenter.z + radius
@@ -120,7 +119,6 @@ public class BatteringRamEntity extends AbstractSiegeEntity implements GeoEntity
             entity.hurtMarked = true;
         });
 
-        // Damage blocks
         for (int y = -1; y <= 1; y++) {
             for (int x = -1; x <= 1; x++) {
                 for (int z = -1; z <= 1; z++) {

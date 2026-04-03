@@ -114,7 +114,7 @@ public class RibauldequinEntity extends AbstractSiegeEntity implements GeoEntity
 
         if (stage >= LOAD_STAGES.length) return InteractionResult.SUCCESS;
         if (getCooldown() > 0) return InteractionResult.SUCCESS;
-        
+
         ItemStack itemStack = player.getItemInHand(hand);
 
         if (itemStack.isEmpty() && canAddPassenger(player) && !player.isShiftKeyDown()) {
@@ -132,7 +132,6 @@ public class RibauldequinEntity extends AbstractSiegeEntity implements GeoEntity
             return InteractionResult.SUCCESS;
         }
 
-        // Handle flint and steel (ignition)
         if (required.item() == Items.FLINT_AND_STEEL) {
             if (!player.isCreative()) {
                 stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(player.getUsedItemHand()));
@@ -143,7 +142,6 @@ public class RibauldequinEntity extends AbstractSiegeEntity implements GeoEntity
             return InteractionResult.SUCCESS;
         }
 
-        // Consume items
         if (!player.isCreative()) {
             if (required.consumesItem() && stack.getCount() < required.amount()) {
                 player.displayClientMessage(
@@ -227,7 +225,6 @@ public class RibauldequinEntity extends AbstractSiegeEntity implements GeoEntity
         serverLevel.addFreshEntity(projectile);
         serverLevel.sendParticles(ParticleTypes.SMOKE, x, y, z, 20, 0.05, 0.05, 0.05, 0.01);
 
-        // Play sound with distance-based volume
         playShootSound(serverLevel);
 
         Vec3 mouthPos = new Vec3(x, y, z);

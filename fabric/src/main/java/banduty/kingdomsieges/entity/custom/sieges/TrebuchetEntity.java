@@ -87,14 +87,12 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
     public InteractionResult handleSiegeInteraction(Player player, InteractionHand hand, ServerLevel serverLevel) {
         if (getCooldown() > 0) return InteractionResult.FAIL;
 
-        // Rotate trebuchet with shift
         if (player.isShiftKeyDown()) {
             setTrackedYaw(getTrackedYaw() + 45.0f);
             setYRot(getTrackedYaw());
             setYBodyRot(getTrackedYaw());
             setYHeadRot(getTrackedYaw());
 
-            // Sync rotation to clients
             List<ServerPlayer> players = serverLevel.players();
             for (ServerPlayer playerEntity : players) {
                 FriendlyByteBuf buffer = PacketByteBufs.create();
