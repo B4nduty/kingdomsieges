@@ -16,7 +16,6 @@ import net.minecraftforge.fml.loading.FMLPaths;
 
 @Mod(Kingdomsieges.MOD_ID)
 public class KingdomSiegesForge {
-    public static KSConfigs CONFIG;
 
     public KingdomSiegesForge() {
         Kingdomsieges.init();
