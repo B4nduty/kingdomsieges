@@ -1,66 +1,80 @@
 package banduty.kingdomsieges.config;
 
-import banduty.kingdomsieges.Kingdomsieges;
-import me.shedaniel.autoconfig.ConfigData;
-import me.shedaniel.autoconfig.annotation.Config;
-import me.shedaniel.autoconfig.annotation.ConfigEntry;
-import me.shedaniel.autoconfig.serializer.PartitioningSerializer;
-import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import net.minecraftforge.common.ForgeConfigSpec;
 
-@Config(name = Kingdomsieges.MOD_ID)
-@Config.Gui.Background("minecraft:textures/block/oak_planks.png")
-public class KSConfigs extends PartitioningSerializer.GlobalData {
+import java.nio.file.Path;
 
-    @ConfigEntry.Category("common")
-    @ConfigEntry.Gui.TransitiveObject()
-    public Common common = new Common();
+public class KSConfigs {
 
-    @Config(name = Kingdomsieges.MOD_ID + "-common")
-    public static final class Common implements ConfigData {
-        @Comment("""
-            When Land's Bell should Ring
-            NEVER | EVERY_INGAME_HOUR | TWELVE_INGAME_HOURS | EVERY_HOUR | TWELVE_HOURS
-            """)
-        public IKSConfig.Choices bellRingTime = IKSConfig.Choices.EVERY_HOUR;
+    public static final ForgeConfigSpec SPEC;
 
-        @Comment("""
-            Cannon Entity Range Render
-            """)
-        public int cannonRange = 100;
+    public static final ForgeConfigSpec.EnumValue<IKSConfig.Choices> bellRingTime;
 
-        @Comment("""
-            Ribauldequin Entity Range Render
-            """)
-        public int ribauldequinRange = 100;
+    public static final ForgeConfigSpec.IntValue cannonRange;
+    public static final ForgeConfigSpec.IntValue ribauldequinRange;
+    public static final ForgeConfigSpec.IntValue batteringRamRange;
+    public static final ForgeConfigSpec.IntValue mangonelRange;
+    public static final ForgeConfigSpec.IntValue trebuchetRange;
+    public static final ForgeConfigSpec.IntValue mantletRange;
+    public static final ForgeConfigSpec.IntValue cannonBallRange;
+    public static final ForgeConfigSpec.IntValue trebuchetProjectileRange;
 
-        @Comment("""
-            Battering Ram Entity Range Render
-            """)
-        public int batteringRamRange = 100;
+    static {
+        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
 
-        @Comment("""
-            Mangonel Entity Range Render
-            """)
-        public int mangonelRange = 100;
+        builder.push("common");
 
-        @Comment("""
-            Trebuchet Entity Range Render
-            """)
-        public int trebuchetRange = 100;
+        bellRingTime = builder
+                .comment(
+                        "When Land's Bell should Ring"
+                )
+                .defineEnum("bellRingTime", IKSConfig.Choices.EVERY_HOUR);
 
-        @Comment("""
-            Mantlet Entity Range Render
-            """)
-        public int mantletRange = 100;
+        cannonRange = builder
+                .comment("Cannon Entity Range Render")
+                .defineInRange("cannonRange", 100, 0, Integer.MAX_VALUE);
 
-        @Comment("""
-            Cannon Ball Entity Range Render
-            """)
-        public int cannonBallRange = 100;
+        ribauldequinRange = builder
+                .comment("Ribauldequin Entity Range Render")
+                .defineInRange("ribauldequinRange", 100, 0, Integer.MAX_VALUE);
 
-        @Comment("""
-            Trebuchet Projectile Entity Range Render
-            """)
-        public int trebuchetProjectileRange = 100;
+        batteringRamRange = builder
+                .comment("Battering Ram Entity Range Render")
+                .defineInRange("batteringRamRange", 100, 0, Integer.MAX_VALUE);
+
+        mangonelRange = builder
+                .comment("Mangonel Entity Range Render")
+                .defineInRange("mangonelRange", 100, 0, Integer.MAX_VALUE);
+
+        trebuchetRange = builder
+                .comment("Trebuchet Entity Range Render")
+                .defineInRange("trebuchetRange", 100, 0, Integer.MAX_VALUE);
+
+        mantletRange = builder
+                .comment("Mantlet Entity Range Render")
+                .defineInRange("mantletRange", 100, 0, Integer.MAX_VALUE);
+
+        cannonBallRange = builder
+                .comment("Cannon Ball Entity Range Render")
+                .defineInRange("cannonBallRange", 100, 0, Integer.MAX_VALUE);
+
+        trebuchetProjectileRange = builder
+                .comment("Trebuchet Projectile Entity Range Render")
+                .defineInRange("trebuchetProjectileRange", 100, 0, Integer.MAX_VALUE);
+
+        builder.pop();
+
+        SPEC = builder.build();
+    }
+
+    public static void loadConfig(ForgeConfigSpec spec, Path path) {
+        final CommentedFileConfig configData = CommentedFileConfig.builder(path)
+                .sync()
+                .autosave()
+                .preserveInsertionOrder()
+                .build();
+        configData.load();
+        spec.setConfig(configData);
     }
 }

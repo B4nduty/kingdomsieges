@@ -1,7 +1,7 @@
 package banduty.kingdomsieges.entity;
 
-import banduty.kingdomsieges.KingdomSiegesForge;
 import banduty.kingdomsieges.Kingdomsieges;
+import banduty.kingdomsieges.config.KSConfigs;
 import banduty.kingdomsieges.entity.custom.projectiles.CannonProjectile;
 import banduty.kingdomsieges.entity.custom.projectiles.TrebuchetProjectile;
 import banduty.kingdomsieges.entity.custom.sieges.*;
@@ -20,7 +20,7 @@ public interface ModEntities {
             ENTITY_TYPES.register("cannon", () ->
                     EntityType.Builder.of(CannonEntity::new, MobCategory.MISC)
                             .sized(2.0f, 1.5f)
-                            .clientTrackingRange(KingdomSiegesForge.CONFIG.common.cannonRange)
+                            .clientTrackingRange(KSConfigs.cannonRange.get())
                             .updateInterval(1)
                             .build("cannon")
             );
@@ -29,7 +29,7 @@ public interface ModEntities {
             ENTITY_TYPES.register("ribauldequin", () ->
                     EntityType.Builder.of(RibauldequinEntity::new, MobCategory.MISC)
                             .sized(2.0f, 1.5f)
-                            .clientTrackingRange(KingdomSiegesForge.CONFIG.common.ribauldequinRange)
+                            .clientTrackingRange(KSConfigs.ribauldequinRange.get())
                             .updateInterval(1)
                             .build("ribauldequin")
             );
@@ -38,7 +38,7 @@ public interface ModEntities {
             ENTITY_TYPES.register("battering_ram", () ->
                     EntityType.Builder.of(BatteringRamEntity::new, MobCategory.MISC)
                             .sized(2.5f, 2.5f)
-                            .clientTrackingRange(KingdomSiegesForge.CONFIG.common.batteringRamRange)
+                            .clientTrackingRange(KSConfigs.batteringRamRange.get())
                             .updateInterval(1)
                             .build("battering_ram")
             );
@@ -47,7 +47,7 @@ public interface ModEntities {
             ENTITY_TYPES.register("mangonel", () ->
                     EntityType.Builder.of(MangonelEntity::new, MobCategory.MISC)
                             .sized(2.8f, 2.5f)
-                            .clientTrackingRange(KingdomSiegesForge.CONFIG.common.mangonelRange)
+                            .clientTrackingRange(KSConfigs.mangonelRange.get())
                             .updateInterval(1)
                             .build("mangonel")
             );
@@ -56,7 +56,7 @@ public interface ModEntities {
             ENTITY_TYPES.register("trebuchet", () ->
                     EntityType.Builder.of(TrebuchetEntity::new, MobCategory.MISC)
                             .sized(4.0f, 3.0f)
-                            .clientTrackingRange(KingdomSiegesForge.CONFIG.common.trebuchetRange)
+                            .clientTrackingRange(KSConfigs.trebuchetRange.get())
                             .updateInterval(1)
                             .build("trebuchet")
             );
@@ -65,7 +65,7 @@ public interface ModEntities {
             ENTITY_TYPES.register("mantlet", () ->
                     EntityType.Builder.of(MantletEntity::new, MobCategory.MISC)
                             .sized(2.5f, 2f)
-                            .clientTrackingRange(KingdomSiegesForge.CONFIG.common.mantletRange)
+                            .clientTrackingRange(KSConfigs.mantletRange.get())
                             .updateInterval(1)
                             .build("mantlet")
             );
@@ -74,7 +74,7 @@ public interface ModEntities {
             ENTITY_TYPES.register("cannon_ball", () ->
                     EntityType.Builder.<CannonProjectile>of(CannonProjectile::new, MobCategory.MISC)
                             .sized(0.25f, 0.25f)
-                            .clientTrackingRange(KingdomSiegesForge.CONFIG.common.cannonBallRange)
+                            .clientTrackingRange(KSConfigs.cannonBallRange.get())
                             .updateInterval(1)
                             .build("cannon_ball")
             );
@@ -83,7 +83,7 @@ public interface ModEntities {
             ENTITY_TYPES.register("trebuchet_projectile", () ->
                     EntityType.Builder.<TrebuchetProjectile>of(TrebuchetProjectile::new, MobCategory.MISC)
                             .sized(0.25f, 0.25f)
-                            .clientTrackingRange(KingdomSiegesForge.CONFIG.common.trebuchetProjectileRange)
+                            .clientTrackingRange(KSConfigs.trebuchetProjectileRange.get())
                             .updateInterval(1)
                             .build("trebuchet_projectile")
             );
