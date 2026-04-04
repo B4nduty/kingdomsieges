@@ -12,17 +12,17 @@ import net.minecraft.world.item.Item;
 
 public interface KSItems {
     Item CANNON_SPAWNER = registerItem("cannon_spawner",
-            new SiegeSpawnerItem(ModEntities.CANNON_ENTITY, new Item.Properties().stacksTo(1)));
+            new SiegeSpawnerItem(ModEntities.CANNON_ENTITY, new Item.Properties()));
     Item BATTERING_RAM_SPAWNER = registerItem("battering_ram_spawner",
-            new SiegeSpawnerItem(ModEntities.BATTERING_RAM_ENTITY, new Item.Properties().stacksTo(1)));
+            new SiegeSpawnerItem(ModEntities.BATTERING_RAM_ENTITY, new Item.Properties()));
     Item RIBAULDEQUIN_SPAWNER = registerItem("ribauldequin_spawner",
-            new SiegeSpawnerItem(ModEntities.RIBAULDEQUIN_ENTITY, new Item.Properties().stacksTo(1)));
+            new SiegeSpawnerItem(ModEntities.RIBAULDEQUIN_ENTITY, new Item.Properties()));
     Item MANGONEL_SPAWNER = registerItem("mangonel_spawner",
-            new SiegeSpawnerItem(ModEntities.MANGONEL_ENTITY, new Item.Properties().stacksTo(1)));
+            new SiegeSpawnerItem(ModEntities.MANGONEL_ENTITY, new Item.Properties()));
     Item TREBUCHET_SPAWNER = registerItem("trebuchet_spawner",
-            new SiegeSpawnerItem(ModEntities.TREBUCHET_ENTITY, new Item.Properties().stacksTo(1)));
+            new SiegeSpawnerItem(ModEntities.TREBUCHET_ENTITY, new Item.Properties()));
     Item MANTLET_SPAWNER = registerItem("mantlet_spawner",
-            new SiegeSpawnerItem(ModEntities.MANTLET_ENTITY, new Item.Properties().stacksTo(1)));
+            new SiegeSpawnerItem(ModEntities.MANTLET_ENTITY, new Item.Properties()));
 
     Item RAMROD = registerItem("ramrod",
             new Item(new Item.Properties().stacksTo(1).defaultDurability(256)));

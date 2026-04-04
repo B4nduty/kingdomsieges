@@ -14,18 +14,19 @@ import net.minecraftforge.registries.RegistryObject;
 public interface KSItems {
     DeferredRegister<Item> ITEMS = DeferredRegister.create(Registries.ITEM, Kingdomsieges.MOD_ID);
 
+    // Required for your own mod entities
     RegistryObject<Item> CANNON_SPAWNER = ITEMS.register("cannon_spawner", () ->
-            new SiegeSpawnerItem(ModEntities.CANNON_ENTITY, new Item.Properties().stacksTo(1)));
+            new SiegeSpawnerItem(ModEntities.CANNON_ENTITY, new Item.Properties()));
     RegistryObject<Item> BATTERING_RAM_SPAWNER = ITEMS.register("battering_ram_spawner", () ->
-            new SiegeSpawnerItem(ModEntities.BATTERING_RAM_ENTITY, new Item.Properties().stacksTo(1)));
+            new SiegeSpawnerItem(ModEntities.BATTERING_RAM_ENTITY, new Item.Properties()));
     RegistryObject<Item> RIBAULDEQUIN_SPAWNER = ITEMS.register("ribauldequin_spawner", () ->
-            new SiegeSpawnerItem(ModEntities.RIBAULDEQUIN_ENTITY, new Item.Properties().stacksTo(1)));
+            new SiegeSpawnerItem(ModEntities.RIBAULDEQUIN_ENTITY, new Item.Properties()));
     RegistryObject<Item> MANGONEL_SPAWNER = ITEMS.register("mangonel_spawner", () ->
-            new SiegeSpawnerItem(ModEntities.MANGONEL_ENTITY, new Item.Properties().stacksTo(1)));
+            new SiegeSpawnerItem(ModEntities.MANGONEL_ENTITY, new Item.Properties()));
     RegistryObject<Item> TREBUCHET_SPAWNER = ITEMS.register("trebuchet_spawner", () ->
-            new SiegeSpawnerItem(ModEntities.TREBUCHET_ENTITY, new Item.Properties().stacksTo(1)));
+            new SiegeSpawnerItem(ModEntities.TREBUCHET_ENTITY, new Item.Properties()));
     RegistryObject<Item> MANTLET_SPAWNER = ITEMS.register("mantlet_spawner", () ->
-            new SiegeSpawnerItem(ModEntities.MANTLET_ENTITY, new Item.Properties().stacksTo(1)));
+            new SiegeSpawnerItem(ModEntities.MANTLET_ENTITY, new Item.Properties()));
 
     RegistryObject<Item> RAMROD = ITEMS.register("ramrod", () ->
             new Item(new Item.Properties().stacksTo(1).defaultDurability(256)));

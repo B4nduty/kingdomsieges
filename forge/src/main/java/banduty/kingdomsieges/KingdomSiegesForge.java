@@ -8,6 +8,7 @@ import banduty.kingdomsieges.lands.ModLands;
 import banduty.kingdomsieges.sounds.ModSounds;
 import banduty.kingdomsieges.structure.ModStructures;
 import banduty.kingdomsieges.util.loottable.ModLootTable;
+import banduty.stoneycore.items.SiegeSpawnerItem;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -39,6 +40,12 @@ public class KingdomSiegesForge {
     private void commonSetup(final FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
             ModLands.registerLands();
+            SiegeSpawnerItem.register(ModEntities.CANNON_ENTITY.get(), KSItems.CANNON_SPAWNER.get());
+            SiegeSpawnerItem.register(ModEntities.BATTERING_RAM_ENTITY.get(), KSItems.BATTERING_RAM_SPAWNER.get());
+            SiegeSpawnerItem.register(ModEntities.RIBAULDEQUIN_ENTITY.get(), KSItems.RIBAULDEQUIN_SPAWNER.get());
+            SiegeSpawnerItem.register(ModEntities.MANGONEL_ENTITY.get(), KSItems.MANGONEL_SPAWNER.get());
+            SiegeSpawnerItem.register(ModEntities.TREBUCHET_ENTITY.get(), KSItems.TREBUCHET_SPAWNER.get());
+            SiegeSpawnerItem.register(ModEntities.MANTLET_ENTITY.get(), KSItems.MANTLET_SPAWNER.get());
         });
     }
 }
