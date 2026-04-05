@@ -3,10 +3,10 @@ package banduty.kingdomsieges.entity.custom.sieges;
 import banduty.kingdomsieges.entity.ModEntities;
 import banduty.kingdomsieges.entity.custom.projectiles.TrebuchetProjectile;
 import banduty.kingdomsieges.sounds.ModSounds;
+import banduty.stoneycore.combat.melee.SCDamageType;
 import banduty.stoneycore.entity.custom.AbstractSiegeEntity;
 import banduty.stoneycore.entity.custom.siegeentity.LoadingStage;
 import banduty.stoneycore.entity.custom.siegeentity.SiegeProperties;
-import banduty.stoneycore.util.SCDamageCalculator;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -163,7 +163,7 @@ public class MangonelEntity extends AbstractSiegeEntity implements GeoEntity {
         projectile.setDeltaMovement(direction.scale(blocksPerTick));
 
         projectile.setBaseDamage(getBaseDamage());
-        projectile.setDamageType(SCDamageCalculator.DamageType.BLUDGEONING);
+        projectile.setDamageType(SCDamageType.BLUDGEONING);
         projectile.setOwner(this);
 
         Item loadedItem = BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(getAmmoLoaded()));

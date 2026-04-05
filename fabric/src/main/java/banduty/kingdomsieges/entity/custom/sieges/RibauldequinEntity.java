@@ -4,12 +4,12 @@ import banduty.kingdomsieges.entity.ModEntities;
 import banduty.kingdomsieges.entity.custom.projectiles.CannonProjectile;
 import banduty.kingdomsieges.items.KSItems;
 import banduty.kingdomsieges.sounds.ModSounds;
+import banduty.stoneycore.combat.melee.SCDamageType;
 import banduty.stoneycore.entity.custom.AbstractSiegeEntity;
 import banduty.stoneycore.entity.custom.siegeentity.LoadingStage;
 import banduty.stoneycore.entity.custom.siegeentity.SiegeProperties;
 import banduty.stoneycore.items.SCItems;
 import banduty.stoneycore.particle.ModParticles;
-import banduty.stoneycore.util.SCDamageCalculator;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -218,7 +218,7 @@ public class RibauldequinEntity extends AbstractSiegeEntity implements GeoEntity
         projectile.setPos(x, y, z);
         projectile.setDeltaMovement(direction.scale(blocksPerTick));
         projectile.setBaseDamage(getBaseDamage());
-        projectile.setDamageType(SCDamageCalculator.DamageType.BLUDGEONING);
+        projectile.setDamageType(SCDamageType.BLUDGEONING);
         projectile.setOwner(this);
         projectile.setShouldBreakBlocks(false);
 

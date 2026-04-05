@@ -3,11 +3,11 @@ package banduty.kingdomsieges.entity.custom.sieges;
 import banduty.kingdomsieges.entity.ModEntities;
 import banduty.kingdomsieges.entity.custom.projectiles.TrebuchetProjectile;
 import banduty.kingdomsieges.sounds.ModSounds;
+import banduty.stoneycore.combat.melee.SCDamageType;
 import banduty.stoneycore.entity.custom.AbstractSiegeEntity;
 import banduty.stoneycore.entity.custom.siegeentity.LoadingStage;
 import banduty.stoneycore.entity.custom.siegeentity.SiegeProperties;
 import banduty.stoneycore.networking.ModMessages;
-import banduty.stoneycore.util.SCDamageCalculator;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -183,7 +183,7 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
         projectile.setDeltaMovement(direction.scale(blocksPerTick));
 
         projectile.setBaseDamage(getBaseDamage());
-        projectile.setDamageType(SCDamageCalculator.DamageType.BLUDGEONING);
+        projectile.setDamageType(SCDamageType.BLUDGEONING);
         projectile.setOwner(this);
 
         Item loadedItem = BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(getAmmoLoaded()));
