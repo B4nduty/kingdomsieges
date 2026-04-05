@@ -45,8 +45,17 @@ public class CannonStructure extends StructureSpawner {
     }
 
     @Override
-    public Entity createEntity(Level level) {
-        return ModEntities.CANNON_ENTITY.get().create(level);
+    public Entity createEntity(Level level, Direction dir) {
+        Entity entity = ModEntities.CANNON_ENTITY.get().create(level);
+
+        if (entity != null) {
+            float yaw = dir.toYRot();
+            entity.setYRot(yaw - 90);
+            entity.setYHeadRot(entity.getYRot());
+            entity.setYBodyRot(entity.getYRot());
+        }
+
+        return entity;
     }
 
     @Override

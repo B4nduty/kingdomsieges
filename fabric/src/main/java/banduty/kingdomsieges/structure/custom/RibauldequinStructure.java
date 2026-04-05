@@ -59,8 +59,17 @@ public class RibauldequinStructure extends StructureSpawner {
     }
 
     @Override
-    public Entity createEntity(Level level) {
-        return ModEntities.RIBAULDEQUIN_ENTITY.create(level);
+    public Entity createEntity(Level level, Direction dir) {
+        Entity entity = ModEntities.RIBAULDEQUIN_ENTITY.create(level);
+
+        if (entity != null) {
+            float yaw = dir.toYRot();
+            entity.setYRot(yaw - 90);
+            entity.setYHeadRot(entity.getYRot());
+            entity.setYBodyRot(entity.getYRot());
+        }
+
+        return entity;
     }
 
     @Override

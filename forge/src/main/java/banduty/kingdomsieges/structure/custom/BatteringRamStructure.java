@@ -16,7 +16,7 @@ import java.util.List;
 public class BatteringRamStructure extends StructureSpawner {
     @Override
     public String[][] getBaseAisles() {
-        return new String[][] {
+        return new String[][]{
                 {
                         "      ",
                         "      ",
@@ -61,8 +61,17 @@ public class BatteringRamStructure extends StructureSpawner {
     }
 
     @Override
-    public Entity createEntity(Level level) {
-        return ModEntities.BATTERING_RAM_ENTITY.get().create(level);
+    public Entity createEntity(Level level, Direction dir) {
+        Entity entity = ModEntities.BATTERING_RAM_ENTITY.get().create(level);
+
+        if (entity != null) {
+            float yaw = dir.toYRot();
+            entity.setYRot(yaw - 90);
+            entity.setYHeadRot(entity.getYRot());
+            entity.setYBodyRot(entity.getYRot());
+        }
+
+        return entity;
     }
 
     @Override

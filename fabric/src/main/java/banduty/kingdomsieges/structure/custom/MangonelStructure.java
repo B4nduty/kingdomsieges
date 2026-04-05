@@ -16,7 +16,7 @@ import java.util.List;
 public class MangonelStructure extends StructureSpawner {
     @Override
     public String[][] getBaseAisles() {
-        return new String[][] {
+        return new String[][]{
                 {
                         "      ",
                         "      ",
@@ -60,8 +60,17 @@ public class MangonelStructure extends StructureSpawner {
     }
 
     @Override
-    public Entity createEntity(Level level) {
-        return ModEntities.MANGONEL_ENTITY.create(level);
+    public Entity createEntity(Level level, Direction dir) {
+        Entity entity = ModEntities.MANGONEL_ENTITY.create(level);
+
+        if (entity != null) {
+            float yaw = dir.toYRot();
+            entity.setYRot(yaw - 90);
+            entity.setYHeadRot(entity.getYRot());
+            entity.setYBodyRot(entity.getYRot());
+        }
+
+        return entity;
     }
 
     @Override

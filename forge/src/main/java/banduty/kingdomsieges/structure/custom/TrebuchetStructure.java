@@ -16,7 +16,7 @@ import java.util.List;
 public class TrebuchetStructure extends StructureSpawner {
     @Override
     public String[][] getBaseAisles() {
-        return new String[][] {
+        return new String[][]{
                 {
                         "       ",
                         "       ",
@@ -90,8 +90,17 @@ public class TrebuchetStructure extends StructureSpawner {
     }
 
     @Override
-    public Entity createEntity(Level level) {
-        return ModEntities.TREBUCHET_ENTITY.get().create(level);
+    public Entity createEntity(Level level, Direction dir) {
+        Entity entity = ModEntities.TREBUCHET_ENTITY.get().create(level);
+
+        if (entity != null) {
+            float yaw = dir.toYRot();
+            entity.setYRot(yaw - 90);
+            entity.setYHeadRot(entity.getYRot());
+            entity.setYBodyRot(entity.getYRot());
+        }
+
+        return entity;
     }
 
     @Override

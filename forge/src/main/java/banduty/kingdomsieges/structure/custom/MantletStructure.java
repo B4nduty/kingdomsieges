@@ -17,7 +17,7 @@ import java.util.List;
 public class MantletStructure extends StructureSpawner {
     @Override
     public String[][] getBaseAisles() {
-        return new String[][] {
+        return new String[][]{
                 // Depth 1
                 {
                         "    ", // Height 2
@@ -67,8 +67,17 @@ public class MantletStructure extends StructureSpawner {
     }
 
     @Override
-    public Entity createEntity(Level level) {
-        return ModEntities.MANTLET_ENTITY.get().create(level);
+    public Entity createEntity(Level level, Direction dir) {
+        Entity entity = ModEntities.MANTLET_ENTITY.get().create(level);
+
+        if (entity != null) {
+            float yaw = dir.toYRot();
+            entity.setYRot(yaw - 90);
+            entity.setYHeadRot(entity.getYRot());
+            entity.setYBodyRot(entity.getYRot());
+        }
+
+        return entity;
     }
 
     @Override
