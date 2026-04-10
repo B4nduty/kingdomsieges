@@ -22,7 +22,9 @@ public interface ModLands {
             ),
             "radius - 24",
             LandType.TerrainType.GROUND,
-            -1
+            -1,
+            0.25d,
+            3
     );
 
     static void registerLands() {
