@@ -10,7 +10,9 @@ import banduty.kingdomsieges.structure.ModStructures;
 import banduty.kingdomsieges.util.loottable.ModLootTable;
 import banduty.stoneycore.items.SiegeSpawnerItem;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -24,7 +26,7 @@ public class KingdomSiegesForge {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         KSConfigs.loadConfig(KSConfigs.SPEC, FMLPaths.GAMEDIR.get().resolve(FMLPaths.CONFIGDIR.get()).resolve(Kingdomsieges.MOD_ID + "-common.toml"));
-
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, KSConfigs.SPEC);
 
         ModEntities.register(modEventBus);
         KSItems.registerItems(modEventBus);
