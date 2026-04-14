@@ -23,8 +23,6 @@ public class KSConfigs {
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
 
-        builder.push("common");
-
         bellRingTime = builder
                 .comment(
                         "When Land's Bell should Ring"
@@ -62,8 +60,6 @@ public class KSConfigs {
         trebuchetProjectileRange = builder
                 .comment("Trebuchet Projectile Entity Range Render")
                 .defineInRange("trebuchetProjectileRange", 100, 0, Integer.MAX_VALUE);
-
-        builder.pop();
 
         SPEC = builder.build();
     }
