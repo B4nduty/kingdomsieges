@@ -79,7 +79,7 @@ public interface KSItemGroups {
     private static void initializeGroup(OwoItemGroup group) {
         group.tabs.add(KS_SIEGE_ENGINES_TAB);
         group.tabs.add(KS_ITEMS_TAB);
-        group.addButton(LinkButton.discord("https://discord.gg/AbtCqntN9S"));
+        group.addButton(LinkButton.discord("https://discord.gg/NvXG4ZWFXc"));
     }
     
     static void registerItemGroups() {
