@@ -21,9 +21,9 @@ import net.minecraft.world.level.ItemLike;
 import java.util.List;
 
 public interface KSItemGroups {
-    ResourceLocation DISCORD_ICON = new ResourceLocation(StoneyCore.MOD_ID, "textures/gui/button/discord.png");
-    ResourceLocation BACKGROUND = new ResourceLocation(StoneyCore.MOD_ID, "textures/gui/group_black.png");
-    ResourceLocation TABS = new ResourceLocation(StoneyCore.MOD_ID, "textures/gui/tabs_black.png");
+    ResourceLocation DISCORD_ICON = ResourceLocation.fromNamespaceAndPath(StoneyCore.MOD_ID, "textures/gui/button/discord.png");
+    ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(StoneyCore.MOD_ID, "textures/gui/group_black.png");
+    ResourceLocation TABS = ResourceLocation.fromNamespaceAndPath(StoneyCore.MOD_ID, "textures/gui/tabs_black.png");
 
     private static ItemStack itemStack(ItemLike item) {
         return new ItemStack(item);
@@ -31,29 +31,29 @@ public interface KSItemGroups {
 
     private static void items(CreativeModeTab.ItemDisplayParameters ctx, CreativeModeTab.Output stacks) {
         stacks.acceptAll(List.of(
-                itemStack(KSItems.RAMROD),
-                itemStack(KSItems.CANNON_MANUSCRIPT),
-                itemStack(KSItems.BATTERING_RAM_MANUSCRIPT),
-                itemStack(KSItems.RIBAULDEQUIN_MANUSCRIPT),
-                itemStack(KSItems.MANGONEL_MANUSCRIPT),
-                itemStack(KSItems.TREBUCHET_MANUSCRIPT),
-                itemStack(KSItems.MANTLET_MANUSCRIPT)
+                itemStack(KSItems.RAMROD.get()),
+                itemStack(KSItems.CANNON_MANUSCRIPT.get()),
+                itemStack(KSItems.BATTERING_RAM_MANUSCRIPT.get()),
+                itemStack(KSItems.RIBAULDEQUIN_MANUSCRIPT.get()),
+                itemStack(KSItems.MANGONEL_MANUSCRIPT.get()),
+                itemStack(KSItems.TREBUCHET_MANUSCRIPT.get()),
+                itemStack(KSItems.MANTLET_MANUSCRIPT.get())
         ));
     }
 
     private static void siegeEngines(CreativeModeTab.ItemDisplayParameters ctx, CreativeModeTab.Output stacks) {
         stacks.acceptAll(List.of(
-                itemStack(KSItems.CANNON_SPAWNER),
-                itemStack(KSItems.BATTERING_RAM_SPAWNER),
-                itemStack(KSItems.RIBAULDEQUIN_SPAWNER),
-                itemStack(KSItems.MANGONEL_SPAWNER),
-                itemStack(KSItems.TREBUCHET_SPAWNER),
-                itemStack(KSItems.MANTLET_SPAWNER)
+                itemStack(KSItems.CANNON_SPAWNER.get()),
+                itemStack(KSItems.BATTERING_RAM_SPAWNER.get()),
+                itemStack(KSItems.RIBAULDEQUIN_SPAWNER.get()),
+                itemStack(KSItems.MANGONEL_SPAWNER.get()),
+                itemStack(KSItems.TREBUCHET_SPAWNER.get()),
+                itemStack(KSItems.MANTLET_SPAWNER.get())
         ));
     }
 
     ItemGroupTab KS_SIEGE_ENGINES_TAB = new ItemGroupTab(
-            Icon.of(KSItems.CANNON_SPAWNER),
+            Icon.of(KSItems.CANNON_SPAWNER.get()),
             Component.translatable("component.itemgroup.kingdomsieges.tab.ks_siege_engines").withStyle(ChatFormatting.WHITE),
             KSItemGroups::siegeEngines,
             TABS,
@@ -61,7 +61,7 @@ public interface KSItemGroups {
     );
 
     ItemGroupTab KS_ITEMS_TAB = new ItemGroupTab(
-            Icon.of(KSItems.RAMROD),
+            Icon.of(KSItems.RAMROD.get()),
             Component.translatable("component.itemgroup.kingdomsieges.tab.ks_items").withStyle(ChatFormatting.WHITE),
             KSItemGroups::items,
             TABS,
@@ -69,9 +69,9 @@ public interface KSItemGroups {
     );
 
     OwoItemGroup KS_TAB = OwoItemGroup
-        .builder(new ResourceLocation(Kingdomsieges.MOD_ID, "ks_tab"), () -> Icon.of(new ResourceLocation(Kingdomsieges.MOD_ID,
+        .builder(ResourceLocation.fromNamespaceAndPath(Kingdomsieges.MOD_ID, "ks_tab"), () -> Icon.of(ResourceLocation.fromNamespaceAndPath(Kingdomsieges.MOD_ID,
                 "icon.png"), 0, 0, 16, 16))
-            .customTexture(BACKGROUND)
+            .backgroundTexture(BACKGROUND)
             .initializer(KSItemGroups::initializeGroup)
             .displaySingleTab()
             .build();

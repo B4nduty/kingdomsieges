@@ -1,5 +1,5 @@
-// 1.20.1	2026-03-17T07:01:00.3006576	Kingdoms & Sieges/Recipes
-06a2ecd2398b19d0ab98ada9913a76b74354474c data\kingdomsieges\advancements\recipes\misc\ramrod_mirrored.json
-c33e0e720d98904fa0617de7222b254a0c12ea2e data\kingdomsieges\advancements\recipes\misc\ramrod.json
-cab39507e3a75f86930473fc0d28451ae76a5cd5 data\kingdomsieges\recipes\ramrod.json
-29548a2548364ee9ab70dd9156cb7122bc299dd0 data\kingdomsieges\recipes\ramrod_mirrored.json
+// 1.21.1	2026-05-22T23:42:07.6564785	Kingdoms & Sieges/Recipes
+f748c8c6b1f220e616ec24f65dcb332c8775889e data\kingdomsieges\advancement\recipes\misc\ramrod_mirrored.json
+38886cec3cd9350da1e6f0934291778dc93a0be3 data\kingdomsieges\recipe\ramrod_mirrored.json
+840320fba8ca2dabf88f0bbd212b215ce226ebfb data\kingdomsieges\advancement\recipes\misc\ramrod.json
+f1ad24a5d692af06c9b92a46c5d43665fa9f300d data\kingdomsieges\recipe\ramrod.json

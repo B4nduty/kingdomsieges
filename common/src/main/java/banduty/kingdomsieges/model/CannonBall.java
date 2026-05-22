@@ -20,13 +20,13 @@ public class CannonBall extends EntityModel<Entity> {
 		return LayerDefinition.create(modelData, 16, 16);
 	}
 
-	@Override
-	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int light, int overlay, float red, float green, float blue, float alpha) {
-		main.render(poseStack, vertexConsumer, light, overlay, red, green, blue, alpha);
-	}
-
     @Override
     public void setupAnim(Entity entity, float f, float g, float h, float i, float j) {
 
     }
+
+	@Override
+	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int light, int overlay, int color) {
+		main.render(poseStack, vertexConsumer, light, overlay, color);
+	}
 }

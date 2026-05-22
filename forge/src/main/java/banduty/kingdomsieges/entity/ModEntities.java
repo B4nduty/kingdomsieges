@@ -4,7 +4,6 @@ import banduty.kingdomsieges.Kingdomsieges;
 import banduty.kingdomsieges.config.KSConfigs;
 import banduty.kingdomsieges.entity.custom.projectiles.CannonProjectile;
 import banduty.kingdomsieges.entity.custom.projectiles.TrebuchetProjectile;
-import banduty.kingdomsieges.entity.custom.sieges.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;

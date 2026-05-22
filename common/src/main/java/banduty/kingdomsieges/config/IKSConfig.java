@@ -6,4 +6,13 @@ public interface IKSConfig {
     }
 
     Choices getBellRingTime();
+
+    int getCannonRange();
+    int getRibauldequinRange();
+    int getBatteringRamRange();
+    int getMangonelRange();
+    int getTrebuchetRange();
+    int getMantletRange();
+    int getCannonBallRange();
+    int getTrebuchetProjectileRange();
 }

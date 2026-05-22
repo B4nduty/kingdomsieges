@@ -21,8 +21,8 @@ public class TrebuchetProjectileModel extends EntityModel<Entity> {
 	}
 
 	@Override
-	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int light, int overlay, float red, float green, float blue, float alpha) {
-		projectile.render(poseStack, vertexConsumer, light, overlay, red, green, blue, alpha);
+	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int light, int overlay, int color) {
+		projectile.render(poseStack, vertexConsumer, light, overlay, color);
 	}
 
     @Override

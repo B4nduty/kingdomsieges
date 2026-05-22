@@ -2,7 +2,7 @@ package banduty.kingdomsieges;
 
 import banduty.kingdomsieges.client.CannonBallRenderer;
 import banduty.kingdomsieges.client.TrebuchetProjectileRenderer;
-import banduty.kingdomsieges.entity.ModEntities;
+import banduty.kingdomsieges.entity.KSEntities;
 import banduty.kingdomsieges.entity.client.batteringram.BatteringRamRenderer;
 import banduty.kingdomsieges.entity.client.cannon.CannonRenderer;
 import banduty.kingdomsieges.entity.client.mangonel.MangonelRenderer;
@@ -17,14 +17,14 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 public class KingdomSiegesFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        EntityRendererRegistry.register(ModEntities.CANNON_BALL, CannonBallRenderer::new);
-        EntityRendererRegistry.register(ModEntities.CANNON_ENTITY, CannonRenderer::new);
-        EntityRendererRegistry.register(ModEntities.BATTERING_RAM_ENTITY, BatteringRamRenderer::new);
-        EntityRendererRegistry.register(ModEntities.RIBAULDEQUIN_ENTITY, RibauldequinRenderer::new);
-        EntityRendererRegistry.register(ModEntities.MANGONEL_ENTITY, MangonelRenderer::new);
-        EntityRendererRegistry.register(ModEntities.TREBUCHET_ENTITY, TrebuchetRenderer::new);
-        EntityRendererRegistry.register(ModEntities.TREBUCHET_PROJECTILE, TrebuchetProjectileRenderer::new);
-        EntityRendererRegistry.register(ModEntities.MANTLET_ENTITY, MantletRenderer::new);
+        EntityRendererRegistry.register(KSEntities.CANNON_BALL.get(), CannonBallRenderer::new);
+        EntityRendererRegistry.register(KSEntities.CANNON_ENTITY.get(), CannonRenderer::new);
+        EntityRendererRegistry.register(KSEntities.BATTERING_RAM_ENTITY.get(), BatteringRamRenderer::new);
+        EntityRendererRegistry.register(KSEntities.RIBAULDEQUIN_ENTITY.get(), RibauldequinRenderer::new);
+        EntityRendererRegistry.register(KSEntities.MANGONEL_ENTITY.get(), MangonelRenderer::new);
+        EntityRendererRegistry.register(KSEntities.TREBUCHET_ENTITY.get(), TrebuchetRenderer::new);
+        EntityRendererRegistry.register(KSEntities.TREBUCHET_PROJECTILE.get(), TrebuchetProjectileRenderer::new);
+        EntityRendererRegistry.register(KSEntities.MANTLET_ENTITY.get(), MantletRenderer::new);
 
         HumanoidModelSetupAnimEvents.AFTER.register(new HumanoidModelAnglesHandler());
     }

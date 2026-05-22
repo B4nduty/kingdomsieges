@@ -1,7 +1,6 @@
 package banduty.kingdomsieges.structure;
 
 import banduty.kingdomsieges.Kingdomsieges;
-import banduty.kingdomsieges.structure.custom.*;
 import banduty.stoneycore.structure.StructureSpawnRegistry;
 import banduty.stoneycore.structure.StructureSpawner;
 import net.minecraft.resources.ResourceLocation;

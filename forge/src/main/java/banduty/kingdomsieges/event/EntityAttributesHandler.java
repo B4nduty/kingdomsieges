@@ -2,7 +2,6 @@ package banduty.kingdomsieges.event;
 
 import banduty.kingdomsieges.Kingdomsieges;
 import banduty.kingdomsieges.entity.ModEntities;
-import banduty.kingdomsieges.entity.custom.sieges.*;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

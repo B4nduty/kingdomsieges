@@ -19,18 +19,18 @@ public class ModModelProvider extends FabricModelProvider {
 
     @Override
     public void generateItemModels(ItemModelGenerators itemModelGenerators) {
-        itemModelGenerators.generateFlatItem(KSItems.CANNON_SPAWNER, ModelTemplates.FLAT_HANDHELD_ITEM);
-        itemModelGenerators.generateFlatItem(KSItems.BATTERING_RAM_SPAWNER, ModelTemplates.FLAT_HANDHELD_ITEM);
-        itemModelGenerators.generateFlatItem(KSItems.RIBAULDEQUIN_SPAWNER, ModelTemplates.FLAT_HANDHELD_ITEM);
-        itemModelGenerators.generateFlatItem(KSItems.MANGONEL_SPAWNER, ModelTemplates.FLAT_HANDHELD_ITEM);
-        itemModelGenerators.generateFlatItem(KSItems.TREBUCHET_SPAWNER, ModelTemplates.FLAT_HANDHELD_ITEM);
-        itemModelGenerators.generateFlatItem(KSItems.MANTLET_SPAWNER, ModelTemplates.FLAT_HANDHELD_ITEM);
-        itemModelGenerators.generateFlatItem(KSItems.RAMROD, ModelTemplates.FLAT_HANDHELD_ITEM);
-        itemModelGenerators.generateFlatItem(KSItems.CANNON_MANUSCRIPT, ModelTemplates.FLAT_HANDHELD_ITEM);
-        itemModelGenerators.generateFlatItem(KSItems.BATTERING_RAM_MANUSCRIPT, ModelTemplates.FLAT_HANDHELD_ITEM);
-        itemModelGenerators.generateFlatItem(KSItems.RIBAULDEQUIN_MANUSCRIPT, ModelTemplates.FLAT_HANDHELD_ITEM);
-        itemModelGenerators.generateFlatItem(KSItems.MANGONEL_MANUSCRIPT, ModelTemplates.FLAT_HANDHELD_ITEM);
-        itemModelGenerators.generateFlatItem(KSItems.TREBUCHET_MANUSCRIPT, ModelTemplates.FLAT_HANDHELD_ITEM);
-        itemModelGenerators.generateFlatItem(KSItems.MANTLET_MANUSCRIPT, ModelTemplates.FLAT_HANDHELD_ITEM);
+        itemModelGenerators.generateFlatItem(KSItems.CANNON_SPAWNER.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
+        itemModelGenerators.generateFlatItem(KSItems.BATTERING_RAM_SPAWNER.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
+        itemModelGenerators.generateFlatItem(KSItems.RIBAULDEQUIN_SPAWNER.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
+        itemModelGenerators.generateFlatItem(KSItems.MANGONEL_SPAWNER.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
+        itemModelGenerators.generateFlatItem(KSItems.TREBUCHET_SPAWNER.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
+        itemModelGenerators.generateFlatItem(KSItems.MANTLET_SPAWNER.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
+        itemModelGenerators.generateFlatItem(KSItems.RAMROD.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
+        itemModelGenerators.generateFlatItem(KSItems.CANNON_MANUSCRIPT.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
+        itemModelGenerators.generateFlatItem(KSItems.BATTERING_RAM_MANUSCRIPT.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
+        itemModelGenerators.generateFlatItem(KSItems.RIBAULDEQUIN_MANUSCRIPT.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
+        itemModelGenerators.generateFlatItem(KSItems.MANGONEL_MANUSCRIPT.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
+        itemModelGenerators.generateFlatItem(KSItems.TREBUCHET_MANUSCRIPT.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
+        itemModelGenerators.generateFlatItem(KSItems.MANTLET_MANUSCRIPT.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
     }
 }

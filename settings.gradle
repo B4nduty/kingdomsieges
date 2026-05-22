@@ -24,4 +24,4 @@ plugins {
 rootProject.name = 'kingdomsieges'
 include("common")
 include("fabric")
-include("forge")
+include("neoforge")
