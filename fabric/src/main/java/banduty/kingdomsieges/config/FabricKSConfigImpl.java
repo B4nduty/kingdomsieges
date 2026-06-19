@@ -5,46 +5,46 @@ import banduty.kingdomsieges.KingdomSiegesFabric;
 public class FabricKSConfigImpl extends KSConfigImpl {
     @Override
     public Choices getBellRingTime() {
-        return KingdomSiegesFabric.getConfig().bellRingTime();
+        return KingdomSiegesFabric.CONFIG.bellRingTime;
     }
 
     @Override
     public int getCannonRange() {
-        return KingdomSiegesFabric.getConfig().clientOptions.cannonRange();
+        return KingdomSiegesFabric.CONFIG.cannonRange;
     }
 
     @Override
     public int getRibauldequinRange() {
-        return KingdomSiegesFabric.getConfig().clientOptions.ribauldequinRange();
+        return KingdomSiegesFabric.CONFIG.ribauldequinRange;
     }
 
     @Override
     public int getBatteringRamRange() {
-        return KingdomSiegesFabric.getConfig().clientOptions.batteringRamRange();
+        return KingdomSiegesFabric.CONFIG.batteringRamRange;
     }
 
     @Override
     public int getMangonelRange() {
-        return KingdomSiegesFabric.getConfig().clientOptions.mangonelRange();
+        return KingdomSiegesFabric.CONFIG.mangonelRange;
     }
 
     @Override
     public int getTrebuchetRange() {
-        return KingdomSiegesFabric.getConfig().clientOptions.trebuchetRange();
+        return KingdomSiegesFabric.CONFIG.trebuchetRange;
     }
 
     @Override
     public int getMantletRange() {
-        return KingdomSiegesFabric.getConfig().clientOptions.mantletRange();
+        return KingdomSiegesFabric.CONFIG.mantletRange;
     }
 
     @Override
     public int getCannonBallRange() {
-        return KingdomSiegesFabric.getConfig().clientOptions.cannonBallRange();
+        return KingdomSiegesFabric.CONFIG.cannonBallRange;
     }
 
     @Override
     public int getTrebuchetProjectileRange() {
-        return KingdomSiegesFabric.getConfig().clientOptions.trebuchetProjectileRange();
+        return KingdomSiegesFabric.CONFIG.trebuchetProjectileRange;
     }
 }

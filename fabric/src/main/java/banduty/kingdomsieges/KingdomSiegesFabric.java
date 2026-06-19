@@ -1,23 +1,24 @@
 package banduty.kingdomsieges;
 
-import banduty.kingdomsieges.config.KingdomSiegesConfig;
+import banduty.kingdomsieges.config.KSConfigs;
 import banduty.kingdomsieges.entity.KSEntities;
 import banduty.kingdomsieges.entity.custom.sieges.*;
 import banduty.kingdomsieges.event.EndWorldTickHandler;
-import banduty.kingdomsieges.items.KSItemGroups;
 import banduty.kingdomsieges.util.loottable.StructureLootModifier;
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 
 public class KingdomSiegesFabric implements ModInitializer {
-    private static final KingdomSiegesConfig CONFIG = KingdomSiegesConfig.createAndLoad();
+    public static KSConfigs CONFIG;
 
     @Override
     public void onInitialize() {
-        Kingdomsieges.init();
+        AutoConfig.register(KSConfigs.class, GsonConfigSerializer::new);
+        CONFIG = AutoConfig.getConfigHolder(KSConfigs.class).getConfig();
 
-        KSItemGroups.registerItemGroups();
         StructureLootModifier.registerLootTableModifications();
         
         Kingdomsieges.LOG.info("Registering Entities Attributes for " + Kingdomsieges.MOD_ID);
@@ -31,9 +32,7 @@ public class KingdomSiegesFabric implements ModInitializer {
         banduty.kingdomsieges.structure.KSStructures.registerStructures();
 
         ServerTickEvents.END_WORLD_TICK.register(new EndWorldTickHandler());
-    }
 
-    public static KingdomSiegesConfig getConfig() {
-        return CONFIG;
+        Kingdomsieges.init();
     }
 }

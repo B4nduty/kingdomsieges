@@ -2,6 +2,7 @@ package banduty.kingdomsieges;
 
 import banduty.kingdomsieges.config.IKSConfig;
 import banduty.kingdomsieges.entity.KSEntities;
+import banduty.kingdomsieges.items.KSItemGroups;
 import banduty.kingdomsieges.items.KSItems;
 import banduty.kingdomsieges.lands.KSLands;
 import banduty.kingdomsieges.platform.Services;
@@ -18,6 +19,7 @@ public class Kingdomsieges {
     public static void init() {
         KSEntities.init();
         KSItems.init();
+        KSItemGroups.registerItemGroups();
         KSSounds.init();
         KSLands.registerLands();
 
