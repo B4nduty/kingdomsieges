@@ -4,15 +4,15 @@ import banduty.kingdomsieges.Kingdomsieges;
 import banduty.kingdomsieges.util.servertick.BellRinger;
 import banduty.stoneycore.lands.util.LandState;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
-@Mod.EventBusSubscriber(modid = Kingdomsieges.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = Kingdomsieges.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public class EndWorldTickHandler {
     @SubscribeEvent
-    public static void onLevelTick(TickEvent.LevelTickEvent event) {
-        if (event.phase == TickEvent.Phase.END && event.level instanceof ServerLevel serverLevel) {
+    public static void onLevelTick(LevelTickEvent.Post event) {
+        if (event.getLevel() instanceof ServerLevel serverLevel) {
             LandState landState = LandState.get(serverLevel);
             BellRinger.tick(serverLevel, landState);
         }

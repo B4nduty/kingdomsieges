@@ -1,13 +1,14 @@
 package banduty.kingdomsieges.datagen;
 
 import banduty.kingdomsieges.Kingdomsieges;
-import banduty.stoneycore.datagen.ForgeModelProviderPlus;
+import banduty.kingdomsieges.items.KSItems;
+import banduty.stoneycore.datagen.NeoForgeModelProviderPlus;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
-public class ModModelProvider extends ForgeModelProviderPlus {
+public class ModModelProvider extends NeoForgeModelProviderPlus {
 
     public ModModelProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
         super(output, Kingdomsieges.MOD_ID, existingFileHelper);

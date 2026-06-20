@@ -1,27 +1,24 @@
 package banduty.kingdomsieges.config;
 
-import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import net.minecraftforge.common.ForgeConfigSpec;
-
-import java.nio.file.Path;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class KSConfigs {
 
-    public static final ForgeConfigSpec SPEC;
+    public static final ModConfigSpec SPEC;
 
-    public static final ForgeConfigSpec.EnumValue<IKSConfig.Choices> bellRingTime;
+    public static final ModConfigSpec.EnumValue<IKSConfig.Choices> bellRingTime;
 
-    public static final ForgeConfigSpec.IntValue cannonRange;
-    public static final ForgeConfigSpec.IntValue ribauldequinRange;
-    public static final ForgeConfigSpec.IntValue batteringRamRange;
-    public static final ForgeConfigSpec.IntValue mangonelRange;
-    public static final ForgeConfigSpec.IntValue trebuchetRange;
-    public static final ForgeConfigSpec.IntValue mantletRange;
-    public static final ForgeConfigSpec.IntValue cannonBallRange;
-    public static final ForgeConfigSpec.IntValue trebuchetProjectileRange;
+    public static final ModConfigSpec.IntValue cannonRange;
+    public static final ModConfigSpec.IntValue ribauldequinRange;
+    public static final ModConfigSpec.IntValue batteringRamRange;
+    public static final ModConfigSpec.IntValue mangonelRange;
+    public static final ModConfigSpec.IntValue trebuchetRange;
+    public static final ModConfigSpec.IntValue mantletRange;
+    public static final ModConfigSpec.IntValue cannonBallRange;
+    public static final ModConfigSpec.IntValue trebuchetProjectileRange;
 
     static {
-        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 
         bellRingTime = builder
                 .comment(
@@ -62,15 +59,5 @@ public class KSConfigs {
                 .defineInRange("trebuchetProjectileRange", 100, 0, Integer.MAX_VALUE);
 
         SPEC = builder.build();
-    }
-
-    public static void loadConfig(ForgeConfigSpec spec, Path path) {
-        final CommentedFileConfig configData = CommentedFileConfig.builder(path)
-                .sync()
-                .autosave()
-                .preserveInsertionOrder()
-                .build();
-        configData.load();
-        spec.setConfig(configData);
     }
 }

@@ -4,6 +4,7 @@ import banduty.kingdomsieges.config.KSConfigs;
 import banduty.kingdomsieges.entity.KSEntities;
 import banduty.kingdomsieges.entity.custom.sieges.*;
 import banduty.kingdomsieges.event.EndWorldTickHandler;
+import banduty.kingdomsieges.lands.KSLands;
 import banduty.kingdomsieges.util.loottable.StructureLootModifier;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
@@ -29,10 +30,10 @@ public class KingdomSiegesFabric implements ModInitializer {
         FabricDefaultAttributeRegistry.register(KSEntities.TREBUCHET_ENTITY.get(), TrebuchetEntity.createAttributes());
         FabricDefaultAttributeRegistry.register(KSEntities.MANTLET_ENTITY.get(), MantletEntity.createAttributes());
 
-        banduty.kingdomsieges.structure.KSStructures.registerStructures();
-
         ServerTickEvents.END_WORLD_TICK.register(new EndWorldTickHandler());
 
         Kingdomsieges.init();
+
+        KSLands.registerLands();
     }
 }

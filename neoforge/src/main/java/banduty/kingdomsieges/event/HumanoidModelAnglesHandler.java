@@ -1,17 +1,18 @@
 package banduty.kingdomsieges.event;
 
 import banduty.kingdomsieges.Kingdomsieges;
+import banduty.kingdomsieges.entity.custom.sieges.*;
 import banduty.stoneycore.entity.custom.AbstractSiegeEntity;
 import banduty.stoneycore.event.custom.HumanoidModelSetupAnimEvents;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 
-@Mod.EventBusSubscriber(modid = Kingdomsieges.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Kingdomsieges.MOD_ID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class HumanoidModelAnglesHandler {
 
     @SubscribeEvent
@@ -32,12 +33,12 @@ public class HumanoidModelAnglesHandler {
 
         if (abstractSiegeEntity instanceof CannonEntity || abstractSiegeEntity instanceof RibauldequinEntity) {
             applyCannonAnimations(model, abstractSiegeEntity, stepWidth, swing, movement, headYaw, headPitch);
-            if (event.isCancelable()) event.setCanceled(true);
+            event.setCanceled(true);
         }
 
         if (abstractSiegeEntity instanceof BatteringRamEntity || abstractSiegeEntity instanceof MangonelEntity || abstractSiegeEntity instanceof MantletEntity) {
             applySiegeEngineAnimations(model, swing, movement, headYaw, headPitch);
-            if (event.isCancelable()) event.setCanceled(true);
+            event.setCanceled(true);
         }
     }
 
