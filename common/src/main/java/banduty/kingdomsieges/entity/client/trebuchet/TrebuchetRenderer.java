@@ -8,7 +8,7 @@ import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
 public class TrebuchetRenderer extends GeoEntityRenderer<TrebuchetEntity> {
     public TrebuchetRenderer(EntityRendererProvider.Context renderManager) {
-        super(renderManager, new banduty.kingdomsieges.entity.client.trebuchet.TrebuchetModel());
+        super(renderManager, new TrebuchetModel());
     }
 
     @Override

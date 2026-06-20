@@ -2,8 +2,11 @@ package banduty.kingdomsieges.entity.client.mangonel;
 
 import banduty.kingdomsieges.Kingdomsieges;
 import banduty.kingdomsieges.entity.custom.sieges.MangonelEntity;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.animal.horse.Horse;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.model.GeoModel;
 
@@ -43,7 +46,8 @@ public class MangonelModel extends GeoModel<MangonelEntity> {
 
         super.setCustomAnimations(animatable, instanceId, animationState);
 
-        getBone("load").ifPresent(geoBone -> geoBone.setHidden(animatable.getAmmoLoaded() == null || !(animatable.getAmmoLoaded().equals("stone"))));
-        getBone("load_magma").ifPresent(geoBone -> geoBone.setHidden(animatable.getAmmoLoaded() == null || !(animatable.getAmmoLoaded().equals("magma"))));
+        Item loadedItem = BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(animatable.getAmmoLoaded()));
+        getBone("load").ifPresent(geoBone -> geoBone.setHidden(animatable.getAmmoLoaded() == null || loadedItem != Items.STONE));
+        getBone("load_magma").ifPresent(geoBone -> geoBone.setHidden(animatable.getAmmoLoaded() == null || loadedItem != Items.MAGMA_BLOCK));
     }
 }
