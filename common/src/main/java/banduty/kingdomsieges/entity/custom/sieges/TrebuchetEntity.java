@@ -206,42 +206,15 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
     @Override
     public void triggerAnimation(String name) {
         switch (name) {
-            case "shoot" -> {
-                stopAnimation("reload");
-                stopAnimation("loaded");
-                stopAnimation("unloaded");
-                triggerAnim("anim_controller", "shoot");
-            }
-            case "reload" -> {
-                stopAnimation("shoot");
-                stopAnimation("loaded");
-                stopAnimation("unloaded");
-                triggerAnim("anim_controller", "reload");
-            }
-            case "loaded" -> {
-                stopAnimation("shoot");
-                stopAnimation("reload");
-                stopAnimation("unloaded");
-                triggerAnim("anim_controller", "loaded");
-            }
-            case "unloaded" -> {
-                stopAnimation("shoot");
-                stopAnimation("reload");
-                stopAnimation("loaded");
-                triggerAnim("anim_controller", "unloaded");
-            }
+            case "shoot" -> triggerAnim("anim_controller", "shoot");
+            case "reload" -> triggerAnim("anim_controller", "reload");
+            case "loaded" -> triggerAnim("anim_controller", "loaded");
+            case "unloaded" -> triggerAnim("anim_controller", "unloaded");
         }
     }
 
     @Override
-    public void stopAnimation(String name) {
-        var controller = this.getAnimatableInstanceCache().getManagerForId(this.getId()).getAnimationControllers().get("anim_controller");
-        if (controller != null && controller.getCurrentAnimation() != null) {
-            if (controller.getCurrentAnimation().animation().name().equals(name)) {
-                controller.forceAnimationReset();
-            }
-        }
-    }
+    public void stopAnimation(String name) {}
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
