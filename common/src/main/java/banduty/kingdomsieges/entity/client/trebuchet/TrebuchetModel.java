@@ -4,7 +4,6 @@ import banduty.kingdomsieges.Kingdomsieges;
 import banduty.kingdomsieges.entity.custom.sieges.TrebuchetEntity;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import software.bernie.geckolib.animation.AnimationState;
@@ -28,22 +27,6 @@ public class TrebuchetModel extends GeoModel<TrebuchetEntity> {
 
     @Override
     public void setCustomAnimations(TrebuchetEntity animatable, long instanceId, AnimationState<TrebuchetEntity> animationState) {
-        getBone("wheels_front").ifPresent(geoBone -> {
-            if (animatable.getCooldown() != 0) return;
-            float wheelRotation = animatable.getWheelRotation();
-            if (animatable.getFirstPassenger() instanceof Horse) wheelRotation = -wheelRotation;
-            geoBone.setRotX((float) Math.toRadians(wheelRotation));
-        });
-
-        getBone("wheels_back").ifPresent(geoBone -> {
-            if (animatable.getCooldown() != 0) return;
-            float wheelRotation = animatable.getWheelRotation();
-            if (animatable.getFirstPassenger() instanceof Horse) wheelRotation = -wheelRotation;
-            geoBone.setRotX((float) Math.toRadians(wheelRotation));
-        });
-
-        getBone("lead").ifPresent(geoBone -> geoBone.setHidden(!(animatable.getFirstPassenger() instanceof Horse)));
-
         super.setCustomAnimations(animatable, instanceId, animationState);
 
         Item loadedItem = BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(animatable.getAmmoLoaded()));

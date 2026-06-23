@@ -101,7 +101,8 @@ public class MangonelEntity extends AbstractSiegeEntity implements GeoEntity {
             }
 
             setAmmoLoaded(match.item().toString());
-            setReloadTime(getBaseReload());
+            int reloadTime = getBaseReload();
+            setReloadTime(reloadTime);
             triggerAnimation("reloading");
             playReloadSound(serverLevel);
             return InteractionResult.SUCCESS;
@@ -133,14 +134,9 @@ public class MangonelEntity extends AbstractSiegeEntity implements GeoEntity {
     @Override
     public void onSiegeTick(ServerLevel serverLevel) {
         if (hasAmmoLoaded()) {
-            if (isReloadComplete() && getCooldown() <= 0) {
-                triggerAnimation("loaded");
-            }
             if (getCooldown() == 7) {
                 fireMangonel(serverLevel);
             }
-        } else if (getCooldown() <= 0 && isReloadComplete()) {
-            triggerAnimation("unloaded");
         }
     }
 
@@ -177,12 +173,22 @@ public class MangonelEntity extends AbstractSiegeEntity implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar registrar) {
-        registrar.add(new AnimationController<>(this, "anim_controller", state -> PlayState.STOP)
-                .triggerableAnim("shoot", shootAnim)
-                .triggerableAnim("reloading", reloadingAnim)
-                .setAnimationSpeed(100.0 / getBaseReload())
-                .triggerableAnim("loaded", loadedAnim)
-                .triggerableAnim("unloaded", unloadedAnim));
+        registrar.add(new AnimationController<>(this, "anim_controller", state -> {
+            if (this.getReloadTime() > 0) {
+                return state.setAndContinue(reloadingAnim);
+            }
+
+            if (this.hasAmmoLoaded() && this.isReloadComplete()) {
+                return state.setAndContinue(loadedAnim);
+            }
+
+            if (!this.hasAmmoLoaded() && this.isReloadComplete()) {
+                return state.setAndContinue(unloadedAnim);
+            }
+
+            return PlayState.STOP;
+        })
+                .triggerableAnim("shoot", shootAnim));
     }
 
     @Override

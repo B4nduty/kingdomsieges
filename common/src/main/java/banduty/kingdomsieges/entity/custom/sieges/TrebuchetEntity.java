@@ -113,7 +113,8 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
             }
 
             setAmmoLoaded(match.item().toString());
-            setReloadTime(getBaseReload());
+            int reloadTime = getBaseReload();
+            setReloadTime(reloadTime);
             triggerAnimation("reload");
             playReloadSound(serverLevel);
             return InteractionResult.SUCCESS;
@@ -146,14 +147,9 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
     @Override
     public void onSiegeTick(ServerLevel serverLevel) {
         if (hasAmmoLoaded()) {
-            if (isReloadComplete() && getCooldown() <= 0) {
-                triggerAnimation("loaded");
-            }
             if (getCooldown() == 52) {
                 fireTrebuchet(serverLevel);
             }
-        } else if (getCooldown() <= 0 && isReloadComplete()) {
-            triggerAnimation("unloaded");
         }
     }
 
@@ -195,12 +191,22 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar registrar) {
-        registrar.add(new AnimationController<>(this, "anim_controller", state -> PlayState.STOP)
-                .triggerableAnim("shoot", shootAnim)
-                .triggerableAnim("reload", reloadAnim)
-                .setAnimationSpeed(getReloadTime() > 0 ? 200.0 / getReloadTime() : 1.0)
-                .triggerableAnim("loaded", loadedAnim)
-                .triggerableAnim("unloaded", unloadedAnim));
+        registrar.add(new AnimationController<>(this, "anim_controller", state -> {
+            if (this.getReloadTime() > 0) {
+                return state.setAndContinue(reloadAnim);
+            }
+
+            if (this.hasAmmoLoaded() && this.isReloadComplete()) {
+                return state.setAndContinue(loadedAnim);
+            }
+
+            if (!this.hasAmmoLoaded() && this.isReloadComplete()) {
+                return state.setAndContinue(unloadedAnim);
+            }
+
+            return PlayState.STOP;
+        })
+                .triggerableAnim("shoot", shootAnim));
     }
 
     @Override
