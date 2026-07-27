@@ -17,7 +17,12 @@ public class TrebuchetRenderer extends GeoEntityRenderer<TrebuchetEntity> {
     }
 
     @Override
-    protected void applyRotations(TrebuchetEntity animatable, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTick) {
+    protected void applyRotations(TrebuchetEntity animatable,
+                                  PoseStack poseStack,
+                                  float ageInTicks,
+                                  float rotationYaw,
+                                  float partialTick,
+                                  float nativeScale) {
         poseStack.mulPose(Axis.YP.rotationDegrees(-animatable.getYRot() - 180.0F));
     }
 }

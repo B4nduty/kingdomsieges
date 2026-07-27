@@ -18,12 +18,17 @@ public class BatteringRamRenderer extends GeoEntityRenderer<BatteringRamEntity> 
     }
 
     @Override
-    protected void applyRotations(BatteringRamEntity animatable, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTick) {
-        super.applyRotations(animatable, poseStack, ageInTicks, rotationYaw, partialTick);
+    protected void applyRotations(BatteringRamEntity animatable,
+                                  PoseStack poseStack,
+                                  float ageInTicks,
+                                  float rotationYaw,
+                                  float partialTick,
+                                  float nativeScale) {
+        super.applyRotations(animatable, poseStack, ageInTicks, rotationYaw, partialTick, nativeScale);
 
         if (animatable.getFirstPassenger() instanceof Horse) {
-            poseStack.translate(0, 0, 3f);
-            poseStack.mulPose(Axis.YP.rotationDegrees(180));
+            poseStack.translate(0.0F, 0.0F, 3.0F);
+            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
         }
     }
 }
