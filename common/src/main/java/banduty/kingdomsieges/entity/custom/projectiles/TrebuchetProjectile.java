@@ -1,8 +1,8 @@
 package banduty.kingdomsieges.entity.custom.projectiles;
 
 import banduty.kingdomsieges.entity.KSEntities;
-import banduty.stoneycore.entity.custom.AbstractSiegeEntity;
-import banduty.stoneycore.entity.custom.AbstractSiegeProjectile;
+import banduty.stoneycore.entity.siege.AbstractSiegeEntity;
+import banduty.stoneycore.entity.projectile.AbstractSiegeProjectile;
 import banduty.stoneycore.util.BlockDamageTracker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

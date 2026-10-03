@@ -2,7 +2,7 @@ package banduty.kingdomsieges.event;
 
 import banduty.kingdomsieges.Kingdomsieges;
 import banduty.kingdomsieges.util.servertick.BellRinger;
-import banduty.stoneycore.lands.util.LandState;
+import banduty.stoneycore.lands.LandState;
 import net.minecraft.server.level.ServerLevel;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;

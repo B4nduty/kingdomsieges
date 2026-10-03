@@ -1,8 +1,8 @@
 package banduty.kingdomsieges.structure.custom;
 
 import banduty.kingdomsieges.entity.KSEntities;
+import banduty.stoneycore.structure.StructureMatcher;
 import banduty.stoneycore.structure.StructureSpawner;
-import banduty.stoneycore.util.patterns.StructureMatcher;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;

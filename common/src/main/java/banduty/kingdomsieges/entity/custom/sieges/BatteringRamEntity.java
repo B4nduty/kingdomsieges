@@ -1,8 +1,8 @@
 package banduty.kingdomsieges.entity.custom.sieges;
 
 import banduty.kingdomsieges.sounds.KSSounds;
-import banduty.stoneycore.entity.custom.AbstractSiegeEntity;
-import banduty.stoneycore.entity.custom.siegeentity.SiegeProperties;
+import banduty.stoneycore.entity.siege.AbstractSiegeEntity;
+import banduty.stoneycore.entity.siege.SiegeProperties;
 import banduty.stoneycore.util.BlockDamageTracker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;

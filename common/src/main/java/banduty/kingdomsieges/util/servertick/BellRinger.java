@@ -2,8 +2,8 @@ package banduty.kingdomsieges.util.servertick;
 
 import banduty.kingdomsieges.Kingdomsieges;
 import banduty.kingdomsieges.config.IKSConfig;
-import banduty.stoneycore.lands.util.Land;
-import banduty.stoneycore.lands.util.LandState;
+import banduty.stoneycore.lands.Land;
+import banduty.stoneycore.lands.LandState;
 import banduty.stoneycore.siege.SiegeManager;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.core.BlockPos;

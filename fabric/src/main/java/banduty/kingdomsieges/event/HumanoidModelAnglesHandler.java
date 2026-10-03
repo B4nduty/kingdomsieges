@@ -1,7 +1,7 @@
 package banduty.kingdomsieges.event;
 
 import banduty.kingdomsieges.entity.custom.sieges.*;
-import banduty.stoneycore.entity.custom.AbstractSiegeEntity;
+import banduty.stoneycore.entity.siege.AbstractSiegeEntity;
 import banduty.stoneycore.event.custom.HumanoidModelSetupAnimEvents;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.util.Mth;
