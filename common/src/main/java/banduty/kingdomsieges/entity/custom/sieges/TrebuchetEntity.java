@@ -1,40 +1,35 @@
 package banduty.kingdomsieges.entity.custom.sieges;
 
 import banduty.kingdomsieges.entity.custom.projectiles.TrebuchetProjectile;
-import banduty.kingdomsieges.platform.Services;
 import banduty.kingdomsieges.sounds.KSSounds;
-import banduty.stoneycore.combat.damagetype.SCDamageType;
-import banduty.stoneycore.entity.siege.AbstractSiegeEntity;
+import banduty.stoneycore.entity.siege.AmmoLoadingSiegeEntity;
 import banduty.stoneycore.entity.siege.LoadingStage;
+import banduty.stoneycore.entity.siege.SiegeAnimation;
 import banduty.stoneycore.entity.siege.SiegeProperties;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import software.bernie.geckolib.animatable.GeoEntity;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.*;
+import software.bernie.geckolib.animation.Animation;
+import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
+import java.util.Map;
 
-public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
+public class TrebuchetEntity extends AmmoLoadingSiegeEntity implements KSGeoSiege {
+
+    private static final float ROTATION_STEP = 45.0f;
 
     private static final SiegeProperties PROPERTIES = SiegeProperties.builder("trebuchet")
             .health(200.0)
@@ -44,29 +39,29 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
             .shootSound(KSSounds.TREBUCHET_SHOOT.get())
             .reloadSoundRange(15.0)
             .shootSoundRange(75.0)
+            .cooldown(60)
+            .fireDelay(8)
             .build();
 
-    private static final LoadingStage[] AMMO_LOADS = {
+    private static final List<LoadingStage> AMMO = List.of(
             LoadingStage.of(Items.STONE),
             LoadingStage.of(Items.MAGMA_BLOCK),
-            LoadingStage.of(Items.ROTTEN_FLESH, 9)
-    };
+            LoadingStage.of(Items.ROTTEN_FLESH, 9));
+
+    private static final Map<SiegeAnimation, RawAnimation> ANIMATIONS = Map.of(
+            SiegeAnimation.FIRE, RawAnimation.begin().then("shoot", Animation.LoopType.PLAY_ONCE));
+    private static final RawAnimation RELOADING = RawAnimation.begin().then("reload", Animation.LoopType.PLAY_ONCE);
+    private static final RawAnimation LOADED = RawAnimation.begin().then("loaded", Animation.LoopType.PLAY_ONCE);
+    private static final RawAnimation UNLOADED = RawAnimation.begin().then("unloaded", Animation.LoopType.PLAY_ONCE);
 
     private final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
-    private final RawAnimation shootAnim = RawAnimation.begin().then("shoot", Animation.LoopType.PLAY_ONCE);
-    private final RawAnimation reloadAnim = RawAnimation.begin().then("reload", Animation.LoopType.PLAY_ONCE);
-    private final RawAnimation loadedAnim = RawAnimation.begin().then("loaded", Animation.LoopType.PLAY_ONCE);
-    private final RawAnimation unloadedAnim = RawAnimation.begin().then("unloaded", Animation.LoopType.PLAY_ONCE);
 
     public TrebuchetEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return LivingEntity.createLivingAttributes()
-                .add(Attributes.MAX_HEALTH, 200.0)
-                .add(Attributes.MOVEMENT_SPEED, 0.0)
-                .add(Attributes.KNOCKBACK_RESISTANCE, 265);
+        return PROPERTIES.createAttributes();
     }
 
     @Override
@@ -76,169 +71,47 @@ public class TrebuchetEntity extends AbstractSiegeEntity implements GeoEntity {
     public boolean canAddPassenger(Entity entity) { return false; }
 
     @Override
-    public InteractionResult handleSiegeInteraction(Player player, InteractionHand hand, ServerLevel serverLevel) {
+    public double getVelocity(Entity passenger) { return 0.0; }
+
+    @Override
+    protected List<LoadingStage> ammoTypes() { return AMMO; }
+
+    @Override
+    protected InteractionResult operate(Player player, ItemStack stack, ServerLevel level) {
         if (getCooldown() > 0) return InteractionResult.FAIL;
 
         if (player.isShiftKeyDown()) {
-            setTrackedYaw(getTrackedYaw() + 45.0f);
-            setYRot(getTrackedYaw());
-            setYBodyRot(getTrackedYaw());
-            setYHeadRot(getTrackedYaw());
-
-            List<ServerPlayer> players = serverLevel.players();
-            for (ServerPlayer playerEntity : players) {
-                Services.PLATFORM.syncSiegeYawPitch(playerEntity, getYRot(), getXRot(), getWheelRotation());
-            }
+            setFacing(getYRot() + ROTATION_STEP);
             return InteractionResult.SUCCESS;
         }
 
-        ItemStack itemStack = player.getItemInHand(hand);
-
-        if (!hasAmmoLoaded()) {
-            LoadingStage match = findMatchingAmmo(itemStack);
-
-            if (match == null) {
-                showAmmoListMessage(player);
-                return InteractionResult.FAIL;
-            }
-
-            if (!player.isCreative()) {
-                if (itemStack.getCount() < match.amount()) {
-                    player.displayClientMessage(
-                            Component.translatable("siege.loading.need_amount", match.amount(),
-                                    match.item().getDefaultInstance().getHoverName()), true);
-                    return InteractionResult.FAIL;
-                }
-                itemStack.shrink(match.amount());
-            }
-
-            setAmmoLoaded(match.item().toString());
-            int reloadTime = getBaseReload();
-            setReloadTime(reloadTime);
-            triggerAnimation("reload");
-            playReloadSound(serverLevel);
-            return InteractionResult.SUCCESS;
-        }
-
-        if (isReloadComplete()) {
-            triggerAnimation("shoot");
-            setCooldown(60);
-            playShootSound(serverLevel);
-            setOwner(player);
-        }
-
-        return InteractionResult.SUCCESS;
-    }
-
-    private LoadingStage findMatchingAmmo(ItemStack stack) {
-        for (LoadingStage stage : AMMO_LOADS) {
-            if (stack.is(stage.item())) return stage;
-        }
-        return null;
-    }
-
-    private void showAmmoListMessage(Player player) {
-        Component ammoList = AMMO_LOADS[0].item().getDefaultInstance().getHoverName()
-                .copy().append(", ").append(AMMO_LOADS[1].item().getDefaultInstance().getHoverName())
-                .append(", ").append(AMMO_LOADS[2].item().getDefaultInstance().getHoverName());
-        player.displayClientMessage(Component.translatable("siege.loading.need_one_of", ammoList), true);
+        return super.operate(player, stack, level);
     }
 
     @Override
-    public void onSiegeTick(ServerLevel serverLevel) {
-        if (hasAmmoLoaded()) {
-            if (getCooldown() == 52) {
-                fireTrebuchet(serverLevel);
-            }
-        }
+    protected void launch(ServerLevel level, Item ammo) {
+        TrebuchetProjectile projectile = new TrebuchetProjectile(this, level);
+        configure(projectile, position().add(0, 12.0, 0), flatAimDirection());
+        projectile.applyAmmo(ammo);
+        level.addFreshEntity(projectile);
     }
 
-    private void fireTrebuchet(ServerLevel serverLevel) {
-        TrebuchetProjectile projectile = new TrebuchetProjectile(this, serverLevel);
-        projectile.setPos(this.getX(), this.getY() + 12.0, this.getZ());
-
-        double blocksPerTick = getProjectileSpeed() / 20.0;
-        float accuracyDegrees = getAccuracyMultiplier();
-        float yawOffset = (random.nextFloat() - 0.5f) * 4 * accuracyDegrees;
-        float adjustedYaw = getTrackedYaw() + yawOffset;
-        float yawRad = (float) Math.toRadians(adjustedYaw);
-
-        Vec3 direction = new Vec3(-Math.sin(yawRad), 0, Math.cos(yawRad)).normalize();
-        projectile.setDeltaMovement(direction.scale(blocksPerTick));
-
-        projectile.setBaseDamage(getBaseDamage());
-        projectile.setDamageType(SCDamageType.BLUDGEONING);
-        projectile.setOwner(this);
-
-        Item loadedItem = BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(getAmmoLoaded()));
-
-        if (loadedItem == Items.STONE) {
-            projectile.setImpactMode(TrebuchetProjectile.ImpactMode.BREAK_BLOCKS);
-            projectile.setTextureName("stone");
-        } else if (loadedItem == Items.MAGMA_BLOCK) {
-            projectile.setImpactMode(TrebuchetProjectile.ImpactMode.SPREAD_FIRE);
-            projectile.setTextureName("magma");
-        } else if (loadedItem == Items.ROTTEN_FLESH) {
-            projectile.setImpactMode(TrebuchetProjectile.ImpactMode.SPREAD_EFFECT);
-            projectile.setStatusEffectInstance(new MobEffectInstance(MobEffects.POISON, 100, 0, true, true, true));
-            projectile.setCloudDuration(600);
-            projectile.setTextureName("rotten_flesh");
-        }
-
-        serverLevel.addFreshEntity(projectile);
-        setAmmoLoaded("");
+    @Nullable
+    @Override
+    public RawAnimation stateAnimation() {
+        if (isReloading()) return RELOADING;
+        return hasAmmoLoaded() ? LOADED : UNLOADED;
     }
 
     @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar registrar) {
-        registrar.add(new AnimationController<>(this, "anim_controller", state -> {
-            if (this.getReloadTime() > 0) {
-                return state.setAndContinue(reloadAnim);
-            }
-
-            if (this.hasAmmoLoaded() && this.isReloadComplete()) {
-                return state.setAndContinue(loadedAnim);
-            }
-
-            if (!this.hasAmmoLoaded() && this.isReloadComplete()) {
-                return state.setAndContinue(unloadedAnim);
-            }
-
-            return PlayState.STOP;
-        })
-                .triggerableAnim("shoot", shootAnim));
-    }
+    public Map<SiegeAnimation, RawAnimation> triggeredAnimations() { return ANIMATIONS; }
 
     @Override
-    public void triggerAnimation(String name) {
-        switch (name) {
-            case "shoot" -> triggerAnim("anim_controller", "shoot");
-            case "reload" -> triggerAnim("anim_controller", "reload");
-            case "loaded" -> triggerAnim("anim_controller", "loaded");
-            case "unloaded" -> triggerAnim("anim_controller", "unloaded");
-        }
-    }
+    public AnimatableInstanceCache getAnimatableInstanceCache() { return animatableInstanceCache; }
 
     @Override
-    public void stopAnimation(String name) {}
+    public Vec3 getPassengerOffset(Entity entity) { return Vec3.ZERO; }
 
     @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return animatableInstanceCache;
-    }
-
-    @Override
-    public Vec3 getPassengerOffset(Entity entity) {
-        return Vec3.ZERO;
-    }
-
-    @Override
-    public double getVelocity(Entity entity) {
-        return 0.0;
-    }
-
-    @Override
-    public Vec3 getPlayerPOV() {
-        return Vec3.ZERO;
-    }
+    public Vec3 getPlayerPOV() { return Vec3.ZERO; }
 }

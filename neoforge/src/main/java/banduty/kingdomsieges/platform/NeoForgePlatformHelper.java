@@ -4,15 +4,12 @@ import banduty.kingdomsieges.Kingdomsieges;
 import banduty.kingdomsieges.config.NeoForgeKSConfigImpl;
 import banduty.kingdomsieges.config.KSConfigImpl;
 import banduty.kingdomsieges.platform.services.IPlatformHelper;
-import banduty.stoneycore.networking.payload.SiegeYawS2CPacket;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
-import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.HashMap;
@@ -65,11 +62,6 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
         );
 
         return deferredRegister.register(name, value);
-    }
-
-    @Override
-    public void syncSiegeYawPitch(ServerPlayer player, float yaw, float pitch, float wheelRotation) {
-        PacketDistributor.sendToPlayer(player, new SiegeYawS2CPacket(yaw, pitch, wheelRotation));
     }
 
     public static void registerRegistries(IEventBus eventBus) {

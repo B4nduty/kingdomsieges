@@ -4,7 +4,6 @@ import banduty.kingdomsieges.config.KSConfigImpl;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.level.ServerPlayer;
 
 import java.util.function.Supplier;
 
@@ -47,6 +46,4 @@ public interface IPlatformHelper {
     <T> Supplier<T> register(Registry<T> registry, String name, Supplier<T> entry);
 
     <T> Holder<T> registerHolder(ResourceKey<Registry<T>> registryKey, String name, Supplier<T> value);
-
-    void syncSiegeYawPitch(ServerPlayer player, float yaw, float pitch, float wheelRotation);
 }

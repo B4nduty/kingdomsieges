@@ -2,7 +2,6 @@ package banduty.kingdomsieges.entity.client.mangonel;
 
 import banduty.kingdomsieges.Kingdomsieges;
 import banduty.kingdomsieges.entity.custom.sieges.MangonelEntity;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.item.Item;
@@ -28,26 +27,20 @@ public class MangonelModel extends GeoModel<MangonelEntity> {
 
     @Override
     public void setCustomAnimations(MangonelEntity animatable, long instanceId, AnimationState<MangonelEntity> animationState) {
-        getBone("wheels_front").ifPresent(geoBone -> {
-            if (animatable.getCooldown() != 0) return;
-            float wheelRotation = animatable.getWheelRotation();
-            if (animatable.getFirstPassenger() instanceof Horse) wheelRotation = -wheelRotation;
-            geoBone.setRotX((float) Math.toRadians(wheelRotation));
-        });
+        boolean horseDrawn = animatable.getFirstPassenger() instanceof Horse;
 
-        getBone("wheels_back").ifPresent(geoBone -> {
-            if (animatable.getCooldown() != 0) return;
-            float wheelRotation = animatable.getWheelRotation();
-            if (animatable.getFirstPassenger() instanceof Horse) wheelRotation = -wheelRotation;
-            geoBone.setRotX((float) Math.toRadians(wheelRotation));
-        });
+        if (animatable.getCooldown() == 0) {
+            float wheelRotation = (float) Math.toRadians(horseDrawn ? -animatable.getWheelRotation() : animatable.getWheelRotation());
+            getBone("wheels_front").ifPresent(bone -> bone.setRotX(wheelRotation));
+            getBone("wheels_back").ifPresent(bone -> bone.setRotX(wheelRotation));
+        }
 
-        getBone("lead").ifPresent(geoBone -> geoBone.setHidden(!(animatable.getFirstPassenger() instanceof Horse)));
+        getBone("lead").ifPresent(bone -> bone.setHidden(!horseDrawn));
 
         super.setCustomAnimations(animatable, instanceId, animationState);
 
-        Item loadedItem = BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(animatable.getAmmoLoaded()));
-        getBone("load").ifPresent(geoBone -> geoBone.setHidden(animatable.getAmmoLoaded() == null || loadedItem != Items.STONE));
-        getBone("load_magma").ifPresent(geoBone -> geoBone.setHidden(animatable.getAmmoLoaded() == null || loadedItem != Items.MAGMA_BLOCK));
+        Item loaded = animatable.getLoadedAmmo();
+        getBone("load").ifPresent(bone -> bone.setHidden(loaded != Items.STONE));
+        getBone("load_magma").ifPresent(bone -> bone.setHidden(loaded != Items.MAGMA_BLOCK));
     }
 }

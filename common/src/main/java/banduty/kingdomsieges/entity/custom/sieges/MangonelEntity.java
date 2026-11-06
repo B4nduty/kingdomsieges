@@ -2,34 +2,30 @@ package banduty.kingdomsieges.entity.custom.sieges;
 
 import banduty.kingdomsieges.entity.custom.projectiles.TrebuchetProjectile;
 import banduty.kingdomsieges.sounds.KSSounds;
-import banduty.stoneycore.combat.damagetype.SCDamageType;
-import banduty.stoneycore.entity.siege.AbstractSiegeEntity;
+import banduty.stoneycore.entity.siege.AmmoLoadingSiegeEntity;
 import banduty.stoneycore.entity.siege.LoadingStage;
+import banduty.stoneycore.entity.siege.SiegeAnimation;
 import banduty.stoneycore.entity.siege.SiegeProperties;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.horse.Horse;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import software.bernie.geckolib.animatable.GeoEntity;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.*;
+import software.bernie.geckolib.animation.Animation;
+import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class MangonelEntity extends AbstractSiegeEntity implements GeoEntity {
+import java.util.List;
+import java.util.Map;
+
+public class MangonelEntity extends AmmoLoadingSiegeEntity implements KSGeoSiege {
 
     private static final SiegeProperties PROPERTIES = SiegeProperties.builder("mangonel")
             .health(60.0)
@@ -38,176 +34,56 @@ public class MangonelEntity extends AbstractSiegeEntity implements GeoEntity {
             .moveSound(KSSounds.SIEGE_ENGINE_MOVE.get())
             .reloadSound(KSSounds.ROPE_CHARGE_GN.get())
             .shootSound(KSSounds.MANGONEL_SHOOT.get())
-            .moveSoundDelay(150)
-            .moveSoundRange(30.0)
-            .reloadSoundRange(15.0)
-            .shootSoundRange(75.0)
+            .cooldown(10)
+            .fireDelay(3)
             .build();
 
-    private static final LoadingStage[] AMMO_LOADS = {
+    private static final List<LoadingStage> AMMO = List.of(
             LoadingStage.of(Items.STONE),
-            LoadingStage.of(Items.MAGMA_BLOCK)
-    };
+            LoadingStage.of(Items.MAGMA_BLOCK));
+
+    private static final Map<SiegeAnimation, RawAnimation> ANIMATIONS = Map.of(
+            SiegeAnimation.FIRE, RawAnimation.begin().then("shoot", Animation.LoopType.PLAY_ONCE));
+    private static final RawAnimation RELOADING = RawAnimation.begin().then("reloading", Animation.LoopType.PLAY_ONCE);
+    private static final RawAnimation LOADED = RawAnimation.begin().then("loaded", Animation.LoopType.PLAY_ONCE);
+    private static final RawAnimation UNLOADED = RawAnimation.begin().then("unloaded", Animation.LoopType.PLAY_ONCE);
 
     private final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
-    private final RawAnimation shootAnim = RawAnimation.begin().then("shoot", Animation.LoopType.PLAY_ONCE);
-    private final RawAnimation reloadingAnim = RawAnimation.begin().then("reloading", Animation.LoopType.PLAY_ONCE);
-    private final RawAnimation loadedAnim = RawAnimation.begin().then("loaded", Animation.LoopType.PLAY_ONCE);
-    private final RawAnimation unloadedAnim = RawAnimation.begin().then("unloaded", Animation.LoopType.PLAY_ONCE);
 
     public MangonelEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return LivingEntity.createLivingAttributes()
-                .add(Attributes.MAX_HEALTH, 60.0)
-                .add(Attributes.MOVEMENT_SPEED, 0.075)
-                .add(Attributes.KNOCKBACK_RESISTANCE, 265);
+        return PROPERTIES.createAttributes();
     }
 
     @Override
     public SiegeProperties getProperties() { return PROPERTIES; }
 
     @Override
-    public InteractionResult handleSiegeInteraction(Player player, InteractionHand hand, ServerLevel serverLevel) {
-        if (getFirstPassenger() != null) return InteractionResult.FAIL;
-        if (getCooldown() > 0) return InteractionResult.FAIL;
+    protected List<LoadingStage> ammoTypes() { return AMMO; }
 
-        ItemStack itemStack = player.getItemInHand(hand);
-
-        if (itemStack.isEmpty() && canAddPassenger(player) && !player.isShiftKeyDown()) {
-            player.startRiding(this);
-            setOwner(player);
-            return InteractionResult.SUCCESS;
-        }
-
-        if (!hasAmmoLoaded()) {
-            LoadingStage match = findMatchingAmmo(itemStack);
-
-            if (match == null) {
-                showAmmoListMessage(player);
-                return InteractionResult.FAIL;
-            }
-
-            if (!player.isCreative()) {
-                if (itemStack.getCount() < match.amount()) {
-                    player.displayClientMessage(
-                            Component.translatable("siege.loading.need_amount", match.amount(),
-                                    match.item().getDefaultInstance().getHoverName()), true);
-                    return InteractionResult.FAIL;
-                }
-                itemStack.shrink(match.amount());
-            }
-
-            setAmmoLoaded(match.item().toString());
-            int reloadTime = getBaseReload();
-            setReloadTime(reloadTime);
-            triggerAnimation("reloading");
-            playReloadSound(serverLevel);
-            return InteractionResult.SUCCESS;
-        }
-
-        if (isReloadComplete()) {
-            triggerAnimation("shoot");
-            setCooldown(10);
-            playShootSound(serverLevel);
-            setOwner(player);
-        }
-
-        return InteractionResult.SUCCESS;
+    @Override
+    protected void launch(ServerLevel level, Item ammo) {
+        TrebuchetProjectile projectile = new TrebuchetProjectile(this, level);
+        configure(projectile, position().add(0, 2.25, 0), flatAimDirection());
+        projectile.applyAmmo(ammo);
+        level.addFreshEntity(projectile);
     }
 
-    private LoadingStage findMatchingAmmo(ItemStack stack) {
-        for (LoadingStage stage : AMMO_LOADS) {
-            if (stack.is(stage.item())) return stage;
-        }
-        return null;
-    }
-
-    private void showAmmoListMessage(Player player) {
-        Component ammoList = AMMO_LOADS[0].item().getDefaultInstance().getHoverName()
-                .copy().append(", ").append(AMMO_LOADS[1].item().getDefaultInstance().getHoverName());
-        player.displayClientMessage(Component.translatable("siege.loading.need_one_of", ammoList), true);
+    @Nullable
+    @Override
+    public RawAnimation stateAnimation() {
+        if (isReloading()) return RELOADING;
+        return hasAmmoLoaded() ? LOADED : UNLOADED;
     }
 
     @Override
-    public void onSiegeTick(ServerLevel serverLevel) {
-        if (hasAmmoLoaded()) {
-            if (getCooldown() == 7) {
-                fireMangonel(serverLevel);
-            }
-        }
-    }
-
-    private void fireMangonel(ServerLevel serverLevel) {
-        TrebuchetProjectile projectile = new TrebuchetProjectile(this, serverLevel);
-        projectile.setPos(this.getX(), this.getY() + 2.25, this.getZ());
-
-        double blocksPerTick = getProjectileSpeed() / 20.0;
-        float accuracyDegrees = getAccuracyMultiplier();
-        float yawOffset = (random.nextFloat() - 0.5f) * 4 * accuracyDegrees;
-        float adjustedYaw = this.getVisualRotationYInDegrees() + yawOffset;
-        float yawRad = (float) Math.toRadians(adjustedYaw);
-
-        Vec3 direction = new Vec3(-Math.sin(yawRad), 0, Math.cos(yawRad)).normalize();
-        projectile.setDeltaMovement(direction.scale(blocksPerTick));
-
-        projectile.setBaseDamage(getBaseDamage());
-        projectile.setDamageType(SCDamageType.BLUDGEONING);
-        projectile.setOwner(this);
-
-        Item loadedItem = BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(getAmmoLoaded()));
-
-        if (loadedItem == Items.STONE) {
-            projectile.setImpactMode(TrebuchetProjectile.ImpactMode.BREAK_BLOCKS);
-            projectile.setTextureName("stone");
-        } else if (loadedItem == Items.MAGMA_BLOCK) {
-            projectile.setImpactMode(TrebuchetProjectile.ImpactMode.SPREAD_FIRE);
-            projectile.setTextureName("magma");
-        }
-
-        serverLevel.addFreshEntity(projectile);
-        setAmmoLoaded("");
-    }
+    public Map<SiegeAnimation, RawAnimation> triggeredAnimations() { return ANIMATIONS; }
 
     @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar registrar) {
-        registrar.add(new AnimationController<>(this, "anim_controller", state -> {
-            if (this.getReloadTime() > 0) {
-                return state.setAndContinue(reloadingAnim);
-            }
-
-            if (this.hasAmmoLoaded() && this.isReloadComplete()) {
-                return state.setAndContinue(loadedAnim);
-            }
-
-            if (!this.hasAmmoLoaded() && this.isReloadComplete()) {
-                return state.setAndContinue(unloadedAnim);
-            }
-
-            return PlayState.STOP;
-        })
-                .triggerableAnim("shoot", shootAnim));
-    }
-
-    @Override
-    public void triggerAnimation(String name) {
-        switch (name) {
-            case "shoot" -> triggerAnim("anim_controller", "shoot");
-            case "reloading" -> triggerAnim("anim_controller", "reloading");
-            case "loaded" -> triggerAnim("anim_controller", "loaded");
-            case "unloaded" -> triggerAnim("anim_controller", "unloaded");
-        }
-    }
-
-    @Override
-    public void stopAnimation(String name) {}
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return animatableInstanceCache;
-    }
+    public AnimatableInstanceCache getAnimatableInstanceCache() { return animatableInstanceCache; }
 
     @Override
     public Vec3 getPassengerOffset(Entity entity) {
@@ -215,7 +91,5 @@ public class MangonelEntity extends AbstractSiegeEntity implements GeoEntity {
     }
 
     @Override
-    public Vec3 getPlayerPOV() {
-        return new Vec3(0.0, -0.7f, 0.0);
-    }
+    public Vec3 getPlayerPOV() { return new Vec3(0.0, -0.7f, 0.0); }
 }

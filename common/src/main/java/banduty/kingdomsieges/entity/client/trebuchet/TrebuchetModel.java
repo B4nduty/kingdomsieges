@@ -2,7 +2,6 @@ package banduty.kingdomsieges.entity.client.trebuchet;
 
 import banduty.kingdomsieges.Kingdomsieges;
 import banduty.kingdomsieges.entity.custom.sieges.TrebuchetEntity;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -29,9 +28,9 @@ public class TrebuchetModel extends GeoModel<TrebuchetEntity> {
     public void setCustomAnimations(TrebuchetEntity animatable, long instanceId, AnimationState<TrebuchetEntity> animationState) {
         super.setCustomAnimations(animatable, instanceId, animationState);
 
-        Item loadedItem = BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(animatable.getAmmoLoaded()));
-        getBone("projectile").ifPresent(geoBone -> geoBone.setHidden(animatable.getAmmoLoaded() == null || loadedItem != Items.STONE));
-        getBone("projectile_magma").ifPresent(geoBone -> geoBone.setHidden(animatable.getAmmoLoaded() == null || loadedItem != Items.MAGMA_BLOCK));
-        getBone("projectile_rotten").ifPresent(geoBone -> geoBone.setHidden(animatable.getAmmoLoaded() == null || loadedItem != Items.ROTTEN_FLESH));
+        Item loaded = animatable.getLoadedAmmo();
+        getBone("projectile").ifPresent(bone -> bone.setHidden(loaded != Items.STONE));
+        getBone("projectile_magma").ifPresent(bone -> bone.setHidden(loaded != Items.MAGMA_BLOCK));
+        getBone("projectile_rotten").ifPresent(bone -> bone.setHidden(loaded != Items.ROTTEN_FLESH));
     }
 }
